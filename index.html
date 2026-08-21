@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Operacional &amp; RH — BARRY CALLEBAUT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ============================================================
+   RESET & VARIÁVEIS
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg); color:var(--tx-primary); font-family:var(--font); font-size:14px;
+  -webkit-font-smoothing:antialiased;
+}
+:root{
+  --bg:#F0F2F5; --card:#FFF; --border:#DDE2EA; --border-light:#EAECF0;
+  --blue:#0079C2; --blue-dark:#005A9E; --blue-light:#E6F2FA;
+  --indigo:#1E3A6E; --indigo-mid:#2D5099;
+  --sb-bg:#0F1B2D; --sb-hover:#1A2D46; --sb-active:#0079C2;
+  --sb-text:#8FA8C4; --sb-text-act:#FFF;
+  --green:#0E7A43; --green-bg:#E8F5EE;
+  --amber:#B45309; --amber-bg:#FEF3C7;
+  --red:#C0281C; --red-bg:#FEE2E0;
+  --purple:#6B21A8;
+  --tx-primary:#0F1B2D; --tx-secondary:#4B5768; --tx-muted:#5C6B7E; --tx-white:#FFF;
+  --font:'Inter',system-ui,sans-serif;
+  --sidebar-w:260px;
+}
+a{color:inherit;}
+img{max-width:100%;}
+button{font-family:var(--font); cursor:pointer;}
+
+/* ============================================================
+   LAYOUT GERAL
+   ============================================================ */
+.app{display:flex; min-height:100vh;}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{
+  width:var(--sidebar-w); flex:0 0 var(--sidebar-w); background:var(--sb-bg); color:var(--sb-text);
+  position:fixed; top:0; left:0; bottom:0; overflow-y:auto; z-index:100;
+  display:flex; flex-direction:column;
+}
+.sb-brand{padding:18px 18px 10px; font-size:15px; font-weight:800; color:#fff; letter-spacing:.3px; line-height:1.3;}
+.sb-brand small{display:block; font-size:10px; font-weight:600; color:var(--sb-text); letter-spacing:.6px; text-transform:uppercase; margin-top:3px;}
+.sb-nav{flex:1; padding:6px 0 24px;}
+.sb-sec{padding:16px 18px 6px; font-size:9px; color:var(--sb-text); text-transform:uppercase; letter-spacing:1.2px; font-weight:700;}
+.sb-item{
+  display:flex; align-items:center; gap:9px; padding:9px 18px; margin:1px 8px; border-radius:7px;
+  color:var(--sb-text); font-size:12.5px; font-weight:500; text-decoration:none; cursor:pointer;
+  min-height:32px; transition:background .12s;
+}
+.sb-item:hover{background:var(--sb-hover); color:#fff;}
+.sb-item.active{background:rgba(0,121,194,0.18); color:var(--sb-text-act); font-weight:500;}
+.sb-item .ic{width:16px; text-align:center; flex-shrink:0; font-size:13px;}
+
+/* ---------- MAIN ---------- */
+.main-wrap{flex:1; margin-left:var(--sidebar-w); min-width:0; display:flex; flex-direction:column;}
+.sticky-header{position:sticky; top:0; z-index:50; background:var(--bg);}
+.topbar{
+  background:#fff; border-bottom:1px solid var(--border); padding:14px 26px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+}
+.topbar h1{font-size:17px; font-weight:800; margin:0; color:var(--tx-primary);}
+.topbar .sub{font-size:11.5px; color:var(--tx-secondary); margin-top:2px; font-weight:500;}
+.period-badge{
+  background:var(--blue-light); color:var(--blue-dark); font-weight:700; font-size:11.5px;
+  padding:6px 12px; border-radius:20px; white-space:nowrap;
+}
+.hamburger-btn{display:none; background:none; border:1px solid var(--border); border-radius:8px; width:40px; height:40px; align-items:center; justify-content:center; font-size:18px; color:var(--tx-primary);}
+.filter-bar{
+  background:#F7F9FC; border-bottom:1px solid var(--border); padding:10px 26px;
+  display:flex; align-items:end; gap:14px; flex-wrap:wrap;
+}
+.fg{display:flex; flex-direction:column; gap:3px; min-width:150px;}
+.fg label{font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--tx-muted);}
+.fg select{
+  padding:7px 10px; border:1px solid var(--border); border-radius:7px; background:#fff; font-family:var(--font);
+  font-size:12.5px; color:var(--tx-primary); min-height:36px; font-weight:500;
+}
+.btn-clear{
+  background:#fff; border:1px solid var(--border); border-radius:7px; padding:8px 14px; font-size:12px;
+  font-weight:700; color:var(--tx-secondary); min-height:36px;
+}
+.btn-clear:hover{background:var(--red-bg); color:var(--red); border-color:#F3D3D0;}
+
+.content{padding:22px 26px 60px; max-width:2400px;}
+section{scroll-margin-top:132px; margin-bottom:44px;}
+section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-primary);}
+.section-sub{font-size:12px; color:var(--tx-secondary); margin:0 0 16px; font-weight:500;}
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+.kpi-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:6px;}
+.kpi{
+  background:var(--card); border-left:4px solid var(--blue); border-radius:8px; box-shadow:0 1px 3px rgba(15,27,45,.06);
+  padding:15px 16px;
+}
+.kpi .kpi-label{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--tx-secondary); margin-bottom:6px;}
+.kpi .kpi-value{font-size:28px; font-weight:900; color:var(--tx-primary); line-height:1.1;}
+.kpi .kpi-sub{font-size:11px; color:var(--tx-secondary); margin-top:4px; font-weight:600;}
+.kpi.acc-green{border-left-color:var(--green);}
+.kpi.acc-amber{border-left-color:var(--amber);}
+.kpi.acc-red{border-left-color:var(--red);}
+.kpi.acc-purple{border-left-color:var(--purple);}
+.kpi.acc-indigo{border-left-color:var(--indigo);}
+
+/* ============================================================
+   BADGES / CHIPS DE SEVERIDADE (reutilizáveis)
+   ============================================================ */
+.dim-card-gap-badge{display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px;}
+.dim-gap-ok{background:var(--green-bg); color:var(--green);}
+.dim-gap-warn{background:var(--amber-bg); color:var(--amber);}
+.dim-gap-crit{background:var(--red-bg); color:var(--red);}
+.dim-gap-exc{background:var(--blue-light); color:var(--blue-dark);}
+
+.dim-pct-chip{display:inline-flex; align-items:center; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:14px;}
+.dim-pct-exc{background:var(--blue-light); color:var(--blue-dark);}
+.dim-pct-ok{background:var(--green-bg); color:var(--green);}
+.dim-pct-warn{background:var(--amber-bg); color:var(--amber);}
+.dim-pct-crit{background:var(--red-bg); color:var(--red);}
+
+.op-exc{background:var(--blue-light); color:var(--blue-dark);}
+.op-ok{background:var(--green-bg); color:var(--green);}
+.op-warn{background:var(--amber-bg); color:var(--amber);}
+.op-crit{background:var(--red-bg); color:var(--red);}
+
+/* ============================================================
+   NODATA BLOCK
+   ============================================================ */
+.nodata-wrap{grid-column:1/-1;}
+
+/* ============================================================
+   CARDS GRID GENÉRICO
+   ============================================================ */
+.cards-grid{display:grid; grid-template-columns:1fr; gap:16px;}
+
+/* ============================================================
+   DIMENSIONAMENTO
+   ============================================================ */
+.dim-unit-card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 18px 8px; box-shadow:0 1px 3px rgba(15,27,45,.05);}
+.dim-unit-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:4px;}
+.dim-unit-name{font-size:15.5px; font-weight:800; color:var(--indigo);}
+.dim-unit-sub{font-size:11.5px; color:var(--tx-secondary); font-weight:600; margin-bottom:14px;}
+.dim-unit-setores{column-width:250px; column-gap:12px;}
+.dim-setor-row{padding:11px 12px; background:#F7F9FC; border:1px solid var(--border-light); border-radius:9px; break-inside:avoid; margin:0 0 12px; display:inline-block; width:100%;}
+.dim-setor-head{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:8px; flex-wrap:wrap;}
+.dim-setor-name{font-size:12px; font-weight:800; letter-spacing:.2px;}
+.dim-setor-delta{font-size:10.5px; font-weight:700; color:var(--tx-secondary);}
+
+.dim-bar-item{margin-bottom:6px;}
+.dim-bar-toprow{display:flex; align-items:center; gap:5px; margin-bottom:3px; font-size:10px;}
+.dim-bar-label{flex:1; min-width:0; white-space:nowrap; color:var(--tx-muted); font-weight:700; text-transform:uppercase;}
+.dim-bar-val{font-weight:800; color:var(--tx-primary); font-size:10.5px;}
+.dim-bar-dot{width:6px; height:6px; border-radius:50%; flex-shrink:0;}
+.dim-bar-track{height:7px; background:var(--border-light); border-radius:5px; overflow:hidden;}
+.dim-bar-fill{height:100%; border-radius:5px; min-width:2px;}
+
+.dim-cargo-list{border-left:2px solid var(--border); padding-left:10px; margin-top:10px;}
+.dim-cargo-row{margin-bottom:10px;}
+.dim-cargo-row:last-child{margin-bottom:0;}
+.dim-cargo-name{font-size:11px; font-weight:700; margin-bottom:5px;}
+.dim-turno-chips{display:flex; gap:5px; flex-wrap:wrap; margin-top:6px;}
+.dim-turno-chip{font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:10px; background:#fff; border:1px solid var(--border); color:var(--tx-secondary);}
+
+/* ============================================================
+   TABELA STICKY (arquitetura de coluna única, seção 5-A/5-B)
+   ============================================================ */
+.uni-scroll{height:clamp(380px, 60vh, 620px); overflow:auto; border:1px solid var(--border); border-radius:10px; background:#fff; position:relative;}
+.table-scroll-controls{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+.arrow-btn{
+  display:none; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px;
+  border:1px solid var(--border); background:#fff; font-size:14px; color:var(--tx-primary); flex-shrink:0;
+}
+table.tgrade-uni, table.tgrade{border-collapse:separate; border-spacing:0; table-layout:fixed; width:max-content; min-width:100%;}
+table.tgrade-uni th, table.tgrade-uni td,
+table.tgrade th, table.tgrade td{box-sizing:border-box;}
+table.tgrade-uni thead th{background:var(--sb-bg); color:#fff; font-size:9.5px; font-weight:700; text-align:center; padding:6px 3px; border-right:1px solid rgba(255,255,255,.08); white-space:normal; line-height:1.35;}
+table.tgrade-uni thead tr:first-child th{padding-top:8px;}
+table.tgrade-uni thead tr:last-child th{padding-bottom:8px;}
+table.tgrade-uni tbody td{font-size:11px; text-align:center; padding:5px 3px; border-bottom:1px solid var(--border-light); border-right:1px solid var(--border-light); white-space:nowrap;}
+table.tgrade-uni tbody tr:hover td:not(.stcol){background:#F7FAFD;}
+
+table.tgrade-uni td.stcol, table.tgrade-uni th.stcol{position:sticky; left:0; z-index:2; padding:0 !important; box-shadow:2px 0 0 var(--indigo); background:#fff;}
+table.tgrade-uni thead th.stcol{z-index:6; background:var(--sb-bg);}
+.stc-flex{display:flex; height:100%; width:100%;}
+.stc-flex>div{box-sizing:border-box; display:flex; align-items:center; justify-content:center; padding:5px 6px; border-right:1px solid var(--border-light); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.stc-flex>div:last-child{border-right:none;}
+thead .stc-flex>div{border-right:1px solid rgba(255,255,255,.14); font-size:9.5px; text-transform:uppercase; letter-spacing:.4px;}
+
+.grp-header{background:var(--indigo); }
+table.tgrade-uni tbody tr.grp-header td{background:var(--indigo); color:#fff; font-weight:800; font-size:12px; padding:8px 10px; text-align:left; border-right:none;}
+table.tgrade-uni tbody tr.grp-header td.stcol{box-shadow:2px 0 0 var(--indigo);}
+
+table.tgrade-uni tbody tr.tr-res-label td.stcol{text-align:right; font-weight:700; font-size:10.5px; padding:6px 10px !important;}
+table.tgrade-uni tbody tr.tr-res-label td.stcol .stc-flex{justify-content:flex-end; text-align:right;}
+table.tgrade-uni tbody tr.tr-res-label td{background:#FAFBFD;}
+table.tgrade-uni tbody tr.tr-res-label.r-fer td.stcol{color:#6B21A8;}
+table.tgrade-uni tbody tr.tr-res-label.r-ferias td.stcol{color:#0079C2;}
+table.tgrade-uni tbody tr.tr-res-label.r-flg td.stcol{color:#64748B;}
+table.tgrade-uni tbody tr.tr-res-label.r-des td.stcol{color:#334155;}
+table.tgrade-uni tbody tr.tr-res-label.r-fi td.stcol{color:#C0281C;}
+table.tgrade-uni tbody tr.tr-res-label.r-fj td.stcol{color:#B45309;}
+table.tgrade-uni tbody tr.tr-res-label.r-p td.stcol{color:#0E7A43;}
+table.tgrade-uni tbody tr.tr-res-label.r-pct td.stcol{color:#0F1B2D; font-weight:800;}
+table.tgrade-uni tbody tr.tr-res-label td:not(.stcol){font-weight:700; color:var(--tx-secondary); font-size:10.5px;}
+
+table.tgrade-uni tbody tr.tr-total td.stcol{font-weight:800; text-align:right; color:#fff; background:var(--blue-dark) !important;}
+table.tgrade-uni tbody tr.tr-total td{background:var(--blue-light); font-weight:800; color:var(--blue-dark);}
+table.tgrade-uni tbody tr.tr-total td.stcol{box-shadow:2px 0 0 var(--indigo);}
+
+td.stcol .colab-name{font-weight:600; color:#0F1B2D;}
+td.stcol .unidade-cell{font-weight:700; color:#1E3A6E;}
+td.stcol .cargo-cell{font-size:11.5px; font-weight:600;}
+td.stcol .turno-cell{font-size:11.5px; font-weight:600; color:#0079C2;}
+
+.col-weekend{background:#F3F5F8;}
+table.tgrade-uni tbody tr:hover td.col-weekend{background:#E2E9F0;}
+th.col-weekend-head{background:#16283F !important;}
+th.folga-geral{color:#ED0000 !important;}
+
+.st-empty{color:#C7CFDA;}
+.mc-p{color:#0E7A43; font-weight:800;}
+.mc-fj{color:#B45309; font-weight:800;}
+.mc-fi{color:#C0281C; font-weight:800;}
+.mc-folga{color:#64748B; font-weight:800;}
+.mc-fer{color:#6B21A8; font-weight:800;}
+.mc-ferias{color:#0079C2; font-weight:800;}
+.mc-d{color:#334155; font-weight:800;}
+.mc-at{color:#C0281C; font-weight:800;}
+.mc-int{color:#2D5099; font-weight:800;}
+.he-mark{position:relative;}
+.he-mark::after{content:''; position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:50%; background:#9900FF;}
+
+.tot-p{background:#E8F5EE !important; color:#0E7A43;}
+.tot-fj{background:#FEF3C7 !important; color:#B45309;}
+.tot-fi{background:#FEE2E0 !important; color:#C0281C;}
+.tot-flg{background:#EEF1F6 !important; color:#334155;}
+table.tgrade-uni thead th.tot-head{white-space:normal; line-height:1.25; font-size:9px;}
+
+.grade-legend{display:flex; flex-wrap:wrap; gap:14px; padding:10px 4px; font-size:11px; color:var(--tx-secondary); font-weight:600;}
+.legend-item{display:flex; align-items:center; gap:6px;}
+.legend-swatch{width:11px; height:11px; border-radius:3px; flex-shrink:0; display:inline-block;}
+.legend-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0; display:inline-block; background:#9900FF;}
+
+/* Presença Operacional específicas */
+table.tgrade-uni tbody tr.oper-pct-row td{font-weight:800;}
+table.tgrade-uni tbody tr.oper-total-row td.stcol{text-align:right; font-weight:800;}
+
+/* ============================================================
+   GRÁFICOS
+   ============================================================ */
+.charts-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(440px,1fr)); gap:16px;}
+.ch, .ch-donut, .ch-hbar{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,27,45,.05);}
+.ch h3, .ch-donut h3, .ch-hbar h3{font-size:12.5px; font-weight:700; margin:0 0 10px; color:var(--tx-primary);}
+.ch-canvas-wrap{position:relative; height:280px;}
+.ch-donut .ch-canvas-wrap{height:240px;}
+.chart-fallback-msg{padding:40px 10px; text-align:center; color:var(--tx-secondary); font-size:12px; font-weight:600;}
+
+/* ============================================================
+   TABELAS GENÉRICAS (Movimentações, Resumo, Hora Extra)
+   ============================================================ */
+.table-wrap{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(15,27,45,.05);}
+.table-scroll{overflow-x:auto;}
+table.std-table{width:100%; min-width:640px; border-collapse:collapse; font-size:12px;}
+table.std-table thead th{background:var(--sb-bg); color:#fff; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:10px 12px; text-align:left; white-space:nowrap;}
+table.std-table tbody td{padding:9px 12px; border-bottom:1px solid var(--border-light); color:var(--tx-primary);}
+table.std-table tbody tr:hover{background:#F7FAFD;}
+table.std-table tbody tr:last-child td{border-bottom:none;}
+.status-chip{display:inline-flex; font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:14px;}
+.status-chip.ok{background:var(--green-bg); color:var(--green);}
+.status-chip.warn{background:var(--amber-bg); color:var(--amber);}
+.status-chip.crit{background:var(--red-bg); color:var(--red);}
+.dim-adm{color:var(--green); font-weight:700;}
+.dim-des{color:var(--red); font-weight:700;}
+
+/* Hora Extra donut / stacked específicos */
+.donut-center-label{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none;}
+.donut-center-label .v{font-size:20px; font-weight:900; color:var(--tx-primary); display:block;}
+.donut-center-label .l{font-size:9.5px; font-weight:700; color:var(--tx-secondary); text-transform:uppercase; letter-spacing:.4px;}
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+@media (min-width:1921px){ .content{max-width:2200px; margin:0 auto;} }
+@media (min-width:2561px){ .content{max-width:2560px;} body{font-size:15px;} }
+
+@media (max-width:1300px){
+  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));}
+  .charts-grid{grid-template-columns:repeat(auto-fit,minmax(380px,1fr));}
+}
+@media (max-width:1024px){
+  .content{padding:18px 16px 50px;}
+  .topbar{padding:12px 16px;}
+  .filter-bar{padding:10px 16px;}
+  .kpi .kpi-value{font-size:24px;}
+}
+@media (max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+  .charts-grid{grid-template-columns:1fr;}
+  .fg{min-width:130px;}
+}
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%); transition:transform .2s ease; box-shadow:2px 0 18px rgba(0,0,0,.25);}
+  .sidebar.open{transform:translateX(0);}
+  .main-wrap{margin-left:0;}
+  .hamburger-btn{display:flex;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:90;}
+  .sidebar-backdrop.show{display:block;}
+  .arrow-btn{display:flex;}
+  section{scroll-margin-top:190px;}
+  .topbar h1{font-size:15px;}
+  .period-badge{font-size:10px; padding:5px 10px;}
+}
+@media (max-width:640px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .fg{min-width:44%; flex:1 1 44%;}
+  .filter-bar{gap:10px;}
+  .btn-clear{flex:1 1 100%;}
+}
+@media (max-width:600px){
+  .dim-unit-setores{column-width:100%;}
+  table.std-table{min-width:520px;}
+}
+@media (max-width:420px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .kpi{padding:12px 12px;}
+  .kpi .kpi-value{font-size:20px;}
+  .content{padding:14px 10px 40px;}
+  .topbar{padding:10px 12px;}
+  section h2{font-size:15px;}
+}
+@supports (padding:max(0px)){
+  .sidebar{padding-left:env(safe-area-inset-left);}
+  .content{padding-left:max(26px, env(safe-area-inset-left)); padding-right:max(26px, env(safe-area-inset-right));}
+}
+button, a.sb-item, select{min-height:36px;}
+@media (max-width:768px){
+  .sb-item{min-height:44px;}
+  .arrow-btn{min-width:44px; min-height:44px;}
+  .hamburger-btn{min-width:44px; min-height:44px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="sidebar-backdrop" id="sbBackdrop"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-brand">BARRY CALLEBAUT
+      <small>Fastlog Serviços · Painel Operacional</small>
+    </div>
+    <div class="sb-nav" id="sbNav">
+      <div class="sb-sec">Produção</div>
+      <a class="sb-item" data-target="#sec-dimensionamento"><span class="ic">📐</span>Dimensionamento</a>
+      <a class="sb-item" data-target="#sec-presenca-operacional"><span class="ic">📋</span>Presença Diária Operacional</a>
+
+      <div class="sb-sec">Presença &amp; Absenteísmo</div>
+      <a class="sb-item" data-target="#sec-kpi"><span class="ic">📊</span>Visão Geral</a>
+      <a class="sb-item" data-target="#sec-grade"><span class="ic">🗓️</span>Controle de Presença Diária</a>
+      <a class="sb-item" data-target="#sec-graficos"><span class="ic">📈</span>Gráficos</a>
+      <a class="sb-item" data-target="#sec-evolucao"><span class="ic">📉</span>Evolução</a>
+      <a class="sb-item" data-target="#sec-presenca"><span class="ic">🔁</span>Movimentações</a>
+      <a class="sb-item" data-target="#sec-resumo"><span class="ic">🧾</span>Resumo</a>
+
+      <div class="sb-sec">Gestão &amp; Custos</div>
+      <a class="sb-item" data-target="#sec-he"><span class="ic">⏱️</span>Hora Extra</a>
+    </div>
+  </nav>
+
+  <div class="main-wrap">
+    <div class="sticky-header">
+      <div class="topbar">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menu">☰</button>
+          <div>
+            <h1>Dashboard Operacional &amp; RH — BARRY CALLEBAUT</h1>
+            <div class="sub">Operado por Fastlog Serviços · dados de presença, dimensionamento e movimentação de pessoal</div>
+          </div>
+        </div>
+        <div class="period-badge" id="periodBadge">Julho–Agosto/2026 · referência 20/08/2026</div>
+      </div>
+      <div class="filter-bar">
+        <div class="fg"><label>Unidade</label><select class="f-unidade" id="f-uni"></select></div>
+        <div class="fg"><label>Mês</label><select class="f-mes" id="f-mes"></select></div>
+        <div class="fg"><label>Turno</label><select class="f-turno" id="f-turno"></select></div>
+        <div class="fg"><label>Cargo</label><select class="f-cargo" id="f-cargo"></select></div>
+        <button class="btn-clear" id="btnClear">✕ Limpar filtros</button>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ================= DIMENSIONAMENTO ================= -->
+      <section id="sec-dimensionamento">
+        <h2>Dimensionamento</h2>
+        <p class="section-sub">Quadro solicitado × contratado por Unidade e Cargo/Setor — quadro fixo para o período Julho–Agosto/2026 (não varia por mês).</p>
+        <div class="kpi-grid" id="dimKpis"></div>
+        <div class="cards-grid" id="dimCards" style="margin-top:16px;"></div>
+      </section>
+
+      <!-- ================= PRESENÇA DIÁRIA OPERACIONAL ================= -->
+      <section id="sec-presenca-operacional">
+        <h2>Controle de Presença Diária Operacional</h2>
+        <p class="section-sub">Comparativo diário Solicitado × Realizado por Setor/Cargo/Turno. Fonte: quadro de dimensionamento realizado diário.</p>
+        <div id="operContainer"></div>
+      </section>
+
+      <!-- ================= VISÃO GERAL (KPIs) ================= -->
+      <section id="sec-kpi">
+        <h2>Visão Geral</h2>
+        <p class="section-sub">Indicadores consolidados de presença, quadro e movimentação, conforme os filtros ativos.</p>
+        <div class="kpi-grid" id="kpiGeral"></div>
+      </section>
+
+      <!-- ================= GRADE DIÁRIA RH ================= -->
+      <section id="sec-grade">
+        <h2>Controle de Presença Diária</h2>
+        <p class="section-sub">Grade dia a dia por colaborador, agrupada por Unidade — Turno.</p>
+        <div id="gradeContainer"></div>
+      </section>
+
+      <!-- ================= GRÁFICOS ================= -->
+      <section id="sec-graficos">
+        <h2>Gráficos</h2>
+        <p class="section-sub">Presença e absenteísmo consolidados por Unidade, Turno e Cargo.</p>
+        <div class="charts-grid" id="graficosContainer"></div>
+      </section>
+
+      <!-- ================= EVOLUÇÃO ================= -->
+      <section id="sec-evolucao">
+        <h2>Evolução</h2>
+        <p class="section-sub">Tendência dia a dia e mês a mês de presença, faltas e absenteísmo.</p>
+        <div class="charts-grid" id="evolucaoCharts" style="margin-bottom:16px;"></div>
+        <div id="evolucaoTabela"></div>
+      </section>
+
+      <!-- ================= MOVIMENTAÇÕES ================= -->
+      <section id="sec-presenca">
+        <h2>Movimentações · Admissões e Desligamentos</h2>
+        <p class="section-sub">Um evento por linha — admissão ou desligamento — sem pareamento entre eles.</p>
+        <div id="movimContainer"></div>
+      </section>
+
+      <!-- ================= RESUMO ================= -->
+      <section id="sec-resumo">
+        <h2>Resumo</h2>
+        <p class="section-sub">Consolidado por Unidade, Mês e Turno.</p>
+        <div id="resumoContainer"></div>
+      </section>
+
+      <!-- ================= HORA EXTRA ================= -->
+      <section id="sec-he">
+        <h2>Hora Extra</h2>
+        <p class="section-sub" id="heSub">Apurado a partir do registro de hora extra de cada colaborador (adicional 50% e 100%).</p>
+        <div class="kpi-grid" id="heKpis"></div>
+        <div id="heTabela" style="margin:16px 0;"></div>
+        <div class="charts-grid" id="heCharts"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script src="data_block_full.js"></script>
+<script>
+'use strict';
+/* ============================================================
+   0. UTILITÁRIOS GERAIS
+   ============================================================ */
+function normalize(s){
+  return (s==null?'':String(s)).normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim();
+}
+function esc(s){
+  return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+function isoToDate(iso){ const [y,m,d]=iso.split('-').map(Number); return new Date(y, m-1, d); }
+function fmtDateShort(iso){ const dt=isoToDate(iso); const dd=String(dt.getDate()).padStart(2,'0'); const mm=String(dt.getMonth()+1).padStart(2,'0'); const yy=String(dt.getFullYear()).slice(2); return `${dd}/${mm}/${yy}`; }
+function weekdayAbbrev(iso){ return DIAS_SEMANA[isoToDate(iso).getDay()]; }
+function isWeekend(iso){ const wd=isoToDate(iso).getDay(); return wd===0||wd===6; }
+function daysInMonth(monthNum, year){ return new Date(year, monthNum, 0).getDate(); }
+function monthNameFromISO(iso){
+  const mnum = +iso.slice(5,7);
+  return Object.keys(MES_NUM).find(k=>MES_NUM[k]===mnum) || iso.slice(0,7);
+}
+function hhmmToDecimal(hhmm){
+  if(!hhmm) return 0;
+  const [h,m] = hhmm.split(':').map(Number);
+  return (h||0) + (m||0)/60;
+}
+function decimalToHHMM(dec){
+  if(!isFinite(dec) || dec<0) dec=0;
+  const totalMin = Math.round(dec*60);
+  const h = Math.floor(totalMin/60), m = totalMin%60;
+  return `${h}:${String(m).padStart(2,'0')}`;
+}
+function hoursToHHMM(dec){ return decimalToHHMM(dec); }
+function fmtNum(n){ return Number.isInteger(n) ? n.toLocaleString('pt-BR') : n.toLocaleString('pt-BR',{maximumFractionDigits:1}); }
+function fmtPct(n){ return n.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'; }
+
+const _measureCanvas = document.createElement('canvas');
+const _measureCtx = _measureCanvas.getContext('2d');
+function measureTextWidth(text, font){
+  _measureCtx.font = font;
+  return _measureCtx.measureText(String(text)).width;
+}
+
+/* ============================================================
+   1. COMPONENTE DE DADOS INDISPONÍVEIS (.nodata-block)
+   ============================================================ */
+function noDataBlock(motivo){
+  return `<div class="nodata-wrap" style="grid-column:1/-1;padding:28px 16px;text-align:center;background:var(--card);border:1px solid #F3D3D0;border-radius:8px">
+    <div style="font-weight:700;color:var(--red);font-size:13.5px;margin-bottom:4px">Dados não disponíveis para esse filtro</div>
+    <div style="font-size:11.5px;color:var(--tx-secondary)">${esc(motivo)}</div>
+  </div>`;
+}
+
+/* ============================================================
+   2. PLUGIN CHART.JS — RÓTULO DE VALOR NAS BARRAS
+   ============================================================ */
+const barValuePlugin = {
+  id:'barValuePlugin',
+  afterDatasetsDraw(chart){
+    const {ctx} = chart;
+    const horizontal = chart.options.indexAxis === 'y';
+    const scaleOpts = chart.options.scales || {};
+    const isStacked = !!((scaleOpts.x && scaleOpts.x.stacked) || (scaleOpts.y && scaleOpts.y.stacked));
+    const pluginOpts = (chart.options.plugins && chart.options.plugins.barValuePlugin) || {};
+    const fmt = pluginOpts.unit==='h' ? (v=>hoursToHHMM(v)+'h') : (pluginOpts.unit==='pct' ? (v=>v.toFixed(1)+'%') : null);
+    ctx.save();
+    ctx.fillStyle='#0F1B2D';
+    ctx.font='700 10px Inter, sans-serif';
+    if(isStacked){
+      const barIdxs = chart.data.datasets.map((d,i)=>i).filter(i=>{
+        const meta = chart.getDatasetMeta(i);
+        return meta.type==='bar' && !meta.hidden;
+      });
+      if(barIdxs.length){
+        const lastMeta = chart.getDatasetMeta(barIdxs[barIdxs.length-1]);
+        const n = (chart.data.labels||[]).length;
+        for(let i=0;i<n;i++){
+          const total = barIdxs.reduce((sum,di)=>{
+            const v = chart.data.datasets[di].data[i];
+            return sum + (typeof v==='number' ? v : 0);
+          },0);
+          const bar = lastMeta.data[i];
+          if(!bar || total<=0) continue;
+          const label = fmt ? fmt(total) : (Number.isInteger(total)? total.toLocaleString('pt-BR') : total.toFixed(1));
+          if(horizontal){ ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(label, bar.x+6, bar.y); }
+          else { ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.fillText(label, bar.x, bar.y-4); }
+        }
+      }
+      ctx.restore(); return;
+    }
+    chart.data.datasets.forEach((ds,di)=>{
+      const meta = chart.getDatasetMeta(di);
+      if(meta.type!=='bar' || meta.hidden) return;
+      meta.data.forEach((bar,i)=>{
+        const v = ds.data[i];
+        if(v===undefined||v===null) return;
+        const label = fmt ? fmt(v) : (typeof v==='number' ? (Number.isInteger(v)? v.toLocaleString('pt-BR') : v.toFixed(1)) : v);
+        if(horizontal){ ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(label, bar.x+6, bar.y); }
+        else { ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.fillText(label, bar.x, bar.y-4); }
+      });
+    });
+    ctx.restore();
+  }
+};
+Chart.register(barValuePlugin);
+
+function renderChartSafe(cardCanvasId, label, fn){
+  try { fn(); }
+  catch(e){
+    console.error('Falha ao renderizar gráfico ('+label+'):', e);
+    const canvas = document.getElementById(cardCanvasId);
+    const wrap = canvas ? canvas.closest('.ch,.ch-donut,.ch-hbar') : null;
+    if(wrap) wrap.innerHTML = '<div class="chart-fallback-msg">Não foi possível carregar este gráfico. Tente atualizar a página.</div>';
+  }
+}
+const charts = {};
+
+/* ============================================================
+   3. PALETA DE CORES POR SETOR / CARGO
+   ============================================================ */
+function paletteFrom(values, seedHues){
+  const map = {};
+  const hues = seedHues && seedHues.length ? seedHues : [210,25,265,340,45,180,300,10];
+  values.forEach((v,i)=>{
+    const h = hues[i % hues.length];
+    map[v] = `hsl(${h}, 32%, 30%)`;
+  });
+  return map;
+}
+let SETOR_COLORS = {}, CARGO_COLORS = {};
+function setorColor(s){ return SETOR_COLORS[s] || '#0F1B2D'; }
+function cargoColor(c){ return CARGO_COLORS[c] || '#4B5768'; }
+
+/* ============================================================
+   4. PRÉ-PROCESSAMENTO — _firstDMonth, listas dinâmicas
+   ============================================================ */
+let TURNOS = [], CARGOS = [];
+let GRADE_COLW = {colab:150, unidade:110, cargo:170, turno:170};
+let OPER_COLW = {setor:110, cargo:190, solicitado:82};
+
+function preprocess(){
+  // 4.1 -- _firstDMonth por colaborador (seção 2.1 do prompt)
+  DADOS.forEach(grp=>{
+    grp.colaboradores.forEach(c=>{
+      let first = null;
+      Object.keys(c.dias||{}).sort().forEach(iso=>{
+        if(c.dias[iso]==='D'){
+          const mnum = +iso.slice(5,7);
+          if(first===null || mnum < first) first = mnum;
+        }
+      });
+      c._firstDMonth = first;
+    });
+  });
+
+  // 4.2 -- listas dinâmicas de Turno e Cargo (nunca hardcoded)
+  const turnoSet = new Set();
+  const cargoSet = new Set();
+  DADOS.forEach(g=>{ turnoSet.add(g.turno); g.colaboradores.forEach(c=>cargoSet.add(c.cargo)); });
+  OPER_DADOS.forEach(g=>{ turnoSet.add(g.turno); g.grupos.forEach(gr=>cargoSet.add(gr.cargo)); });
+  TURNOS = Array.from(turnoSet).sort((a,b)=>{
+    const rank = t=>{
+      const m = /^Escala\s+([A-Za-z])$/i.exec(t);
+      if(m) return m[1].toUpperCase().charCodeAt(0);
+      if(/administrativ/i.test(t)) return 900;
+      return 999;
+    };
+    const ra=rank(a), rb=rank(b);
+    return ra!==rb ? ra-rb : a.localeCompare(b,'pt-BR');
+  });
+  CARGOS = Array.from(cargoSet).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+
+  SETOR_COLORS = paletteFrom(CARGOS, [210,25,265,340,45,180,300,10]);
+  CARGO_COLORS = paletteFrom(CARGOS, [25,210,340,265,180,45,10,300]);
+
+  // 4.3 -- largura das subcolunas da Grade RH (medida real, não "chute")
+  const fCargo = '600 11.5px Inter, sans-serif';
+  const fUnid = '700 11.5px Inter, sans-serif';
+  const fTurno = '600 11.5px Inter, sans-serif';
+  const fColab = '600 12px Inter, sans-serif';
+  let wColab=0,wUnid=0,wCargo=0,wTurno=0;
+  DADOS.forEach(g=>{
+    wUnid = Math.max(wUnid, measureTextWidth(g.unidade, fUnid));
+    wTurno = Math.max(wTurno, measureTextWidth(g.turno, fTurno));
+    g.colaboradores.forEach(c=>{
+      const nome = c.nome.length>16 ? c.nome.slice(0,16)+'…' : c.nome;
+      wColab = Math.max(wColab, measureTextWidth(nome, fColab));
+      wCargo = Math.max(wCargo, measureTextWidth(c.cargo, fCargo));
+    });
+  });
+  GRADE_COLW = {
+    colab: Math.max(120, Math.ceil(wColab)+26),
+    unidade: Math.max(90, Math.ceil(wUnid)+20),
+    cargo: Math.max(110, Math.ceil(wCargo)+20),
+    turno: Math.max(110, Math.ceil(wTurno)+20),
+  };
+
+  // 4.4 -- largura das subcolunas da Grade Operacional
+  let owSetor=0, owCargo=0;
+  OPER_DADOS.forEach(g=>{
+    g.grupos.forEach(gr=>{
+      owSetor = Math.max(owSetor, measureTextWidth(gr.setor, fCargo));
+      owCargo = Math.max(owCargo, measureTextWidth(gr.cargo, fCargo));
+    });
+  });
+  OPER_COLW = {
+    setor: Math.max(90, Math.ceil(owSetor)+20),
+    cargo: Math.max(140, Math.ceil(owCargo)+20),
+    solicitado: 82,
+  };
+}
+
+function isColabActiveForMonth(c, monthNum){
+  return c._firstDMonth == null || monthNum <= c._firstDMonth;
+}
+
+/* ============================================================
+   5. DIAS DO PERÍODO (por mês, calendário cheio)
+   ============================================================ */
+const REF_Y = +REF_DATE.slice(0,4), REF_M = +REF_DATE.slice(5,7), REF_D = +REF_DATE.slice(8,10);
+function periodDaysForMonth(monthName, year){
+  year = year || REF_Y;
+  const mnum = MES_NUM[monthName];
+  const last = daysInMonth(mnum, year);
+  const days = [];
+  for(let d=1; d<=last; d++){
+    days.push(`${year}-${String(mnum).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  }
+  return days;
+}
+function periodDays(mesFiltro){
+  const meses = mesFiltro ? [mesFiltro] : MESES;
+  let out = [];
+  meses.forEach(m=> out = out.concat(periodDaysForMonth(m)));
+  return out;
+}
+function isFutureDay(iso){ return iso > REF_DATE; }
+
+/* ============================================================
+   6. AGREGAÇÃO CENTRAL DE PRESENÇA (fonte única de verdade)
+   ============================================================ */
+function collectDayStatuses(opts){
+  opts = opts || {};
+  const meses = opts.mes ? [opts.mes] : MESES;
+  const monthNums = meses.map(m=>MES_NUM[m]);
+  const rows = [];
+  DADOS.forEach(grp=>{
+    if(opts.unidade && grp.unidade!==opts.unidade) return;
+    if(opts.turno && grp.turno!==opts.turno) return;
+    grp.colaboradores.forEach(c=>{
+      if(opts.cargo && c.cargo!==opts.cargo) return;
+      Object.keys(c.dias||{}).forEach(iso=>{
+        const mnum = +iso.slice(5,7);
+        if(monthNums.indexOf(mnum)===-1) return;
+        if(!isColabActiveForMonth(c, mnum)) return;
+        rows.push({date:iso, status:c.dias[iso], unidade:grp.unidade, turno:grp.turno, cargo:c.cargo, colab:c});
+      });
+    });
+  });
+  return rows;
+}
+function countStatuses(rows){
+  const out = {P:0,FJ:0,FI:0,FOLGA:0,FER:0,FERIAS:0,D:0,AT:0,INT:0};
+  rows.forEach(r=>{ if(out[r.status]!==undefined) out[r.status]++; });
+  return out;
+}
+function pctPresencaFromCounts(counts){
+  const fiEff = counts.FI + counts.AT;
+  const denom = counts.P + counts.FJ + fiEff;
+  return denom>0 ? +(counts.P/denom*100).toFixed(1) : 0;
+}
+function collectColabs(opts){
+  opts = opts || {};
+  const meses = opts.mes ? [opts.mes] : MESES;
+  const monthNums = meses.map(m=>MES_NUM[m]);
+  const out = [];
+  DADOS.forEach(grp=>{
+    if(opts.unidade && grp.unidade!==opts.unidade) return;
+    if(opts.turno && grp.turno!==opts.turno) return;
+    grp.colaboradores.forEach(c=>{
+      if(opts.cargo && c.cargo!==opts.cargo) return;
+      const active = monthNums.some(m=>isColabActiveForMonth(c,m));
+      if(active) out.push(c);
+    });
+  });
+  return out;
+}
+
+/* ============================================================
+   7. ESTADO GLOBAL E FILTROS
+   ============================================================ */
+const state = {unidade:'', mes:'', turno:'', cargo:''};
+
+function populateSelect(sel, values, allLabel){
+  sel.innerHTML='';
+  const optAll = document.createElement('option');
+  optAll.value=''; optAll.textContent=allLabel;
+  sel.appendChild(optAll);
+  values.forEach(v=>{
+    const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);
+  });
+}
+function initFilters(){
+  const selUnidade = document.querySelectorAll('.f-unidade');
+  const selMes     = document.querySelectorAll('.f-mes');
+  const selTurno   = document.querySelectorAll('.f-turno');
+  const selCargo   = document.querySelectorAll('.f-cargo');
+  selUnidade.forEach(s=>populateSelect(s, UNIDS, 'Todas'));
+  selMes.forEach(s=>populateSelect(s, MESES, 'Todos'));
+  selTurno.forEach(s=>populateSelect(s, TURNOS, 'Todos'));
+  selCargo.forEach(s=>populateSelect(s, CARGOS, 'Todos'));
+  selMes.forEach(s=>{ s.value = state.mes; });
+
+  function syncAndRender(field, val){
+    state[field]=val;
+    document.querySelectorAll('.f-'+field).forEach(s=>{ s.value = val; });
+    renderAll();
+  }
+  selUnidade.forEach(s=>s.addEventListener('change', e=>syncAndRender('unidade', e.target.value)));
+  selMes.forEach(s=>s.addEventListener('change', e=>syncAndRender('mes', e.target.value)));
+  selTurno.forEach(s=>s.addEventListener('change', e=>syncAndRender('turno', e.target.value)));
+  selCargo.forEach(s=>s.addEventListener('change', e=>syncAndRender('cargo', e.target.value)));
+  document.querySelectorAll('#btnClear').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.unidade=''; state.mes=''; state.turno=''; state.cargo='';
+      document.querySelectorAll('.f-unidade,.f-mes,.f-turno,.f-cargo').forEach(s=>{ s.value=''; });
+      renderAll();
+    });
+  });
+}
+
+function turnoKeyMatch(turnosObj, turnoFiltro){
+  if(!turnoFiltro) return null;
+  const target = normalize(turnoFiltro);
+  return Object.keys(turnosObj||{}).find(k=>normalize(k)===target);
+}
+function wireArrowButtons(idL, idR, scrollId){
+  const btnL = document.getElementById(idL), btnR = document.getElementById(idR), wrap = document.getElementById(scrollId);
+  if(!btnL||!btnR||!wrap) return;
+  btnL.addEventListener('click', ()=> wrap.scrollBy({left:-240, behavior:'smooth'}));
+  btnR.addEventListener('click', ()=> wrap.scrollBy({left:240, behavior:'smooth'}));
+}
+function destroyChart(key){
+  if(charts[key]){ try{ charts[key].destroy(); }catch(e){} delete charts[key]; }
+}
+
+/* ============================================================
+   8. DIMENSIONAMENTO (#sec-dimensionamento)
+   ============================================================ */
+function dimPctAndBadge(sol, con){
+  let pct;
+  if(sol<=0){ pct = 100; }
+  else { pct = con/sol*100; }
+  let cls;
+  if(sol<=0 && con>0) cls='dim-pct-exc';
+  else if(pct>100) cls='dim-pct-exc';
+  else if(pct>=95) cls='dim-pct-ok';
+  else if(pct>=80) cls='dim-pct-warn';
+  else cls='dim-pct-crit';
+  return {pct, cls};
+}
+function dimGapBadge(sol, con){
+  const gap = sol - con;
+  if(sol<=0 && con>0) return {cls:'dim-gap-exc', label:`Excedente +${con}`};
+  if(gap<0) return {cls:'dim-gap-exc', label:`Excedente +${-gap}`};
+  if(gap===0) return {cls:'dim-gap-ok', label:'Atendido'};
+  const thresholdWarn = Math.max(1, Math.ceil(sol*0.2));
+  if(gap<=thresholdWarn) return {cls:'dim-gap-warn', label:`GAP: ${gap}`};
+  return {cls:'dim-gap-crit', label:`GAP: ${gap}`};
+}
+function turnoShortLabel(key){
+  const m = /^ESCALA\s+([A-Z])$/i.exec(key);
+  if(m) return 'Esc. '+m[1].toUpperCase();
+  if(/administrativ/i.test(key)) return 'Adm';
+  return key.length>10 ? key.slice(0,10)+'…' : key;
+}
+function renderDimBarPair(sol, con){
+  const rowMax = Math.max(sol, con, 1);
+  const wSol = Math.round(sol/rowMax*100);
+  const wCon = Math.round(con/rowMax*100);
+  const {cls} = dimPctAndBadge(sol,con);
+  const conColor = cls==='dim-pct-exc' ? 'var(--blue)' : cls==='dim-pct-ok' ? 'var(--green)' : cls==='dim-pct-warn' ? 'var(--amber)' : 'var(--red)';
+  return `
+    <div class="dim-bar-item">
+      <div class="dim-bar-toprow"><span class="dim-bar-dot" style="background:var(--indigo)"></span><span class="dim-bar-label">Solicitado</span><span class="dim-bar-val">${fmtNum(sol)}</span></div>
+      <div class="dim-bar-track"><div class="dim-bar-fill" style="width:${wSol}%;background:var(--indigo)"></div></div>
+    </div>
+    <div class="dim-bar-item">
+      <div class="dim-bar-toprow"><span class="dim-bar-dot" style="background:${conColor}"></span><span class="dim-bar-label">Contratado</span><span class="dim-bar-val">${fmtNum(con)}</span></div>
+      <div class="dim-bar-track"><div class="dim-bar-fill" style="width:${wCon}%;background:${conColor}"></div></div>
+    </div>`;
+}
+function renderDimUnitCard(cd, dimCargoData, effectiveVals){
+  const badge = dimGapBadge(cd.sol, cd.con);
+  const tiles = cd.rows.map(d=>{
+    const v = effectiveVals(d.cargo);
+    const {cls:pctCls, pct} = dimPctAndBadge(v.solicitado, v.contratado);
+    const delta = v.contratado - v.solicitado;
+    const cargoRow = dimCargoData.find(x=>x.unidade===cd.unidade && x.cargo===d.cargo);
+    const turnoChips = cargoRow ? Object.keys(cargoRow.turnos).map(k=>{
+      const tv = cargoRow.turnos[k];
+      if(tv.solicitado===0 && tv.contratado===0) return '';
+      return `<span class="dim-turno-chip" title="${esc(k)}: solicitado ${tv.solicitado} · contratado ${tv.contratado}">${esc(turnoShortLabel(k))} ${tv.contratado}/${tv.solicitado}</span>`;
+    }).join('') : '';
+    return `
+      <div class="dim-setor-row">
+        <div class="dim-setor-head">
+          <span class="dim-setor-name" style="color:${setorColor(d.cargo)}">${esc(d.cargo)}</span>
+          <span class="dim-pct-chip ${pctCls}">${fmtPct(pct)}</span>
+          <span class="dim-setor-delta">${delta>=0? '+'+delta : delta} colab.</span>
+        </div>
+        ${renderDimBarPair(v.solicitado, v.contratado)}
+        <div class="dim-cargo-list">
+          <div class="dim-cargo-row">
+            <div class="dim-cargo-name" style="color:${cargoColor(d.cargo)}">${esc(d.cargo)}</div>
+            ${renderDimBarPair(v.solicitado, v.contratado)}
+            <div class="dim-turno-chips">${turnoChips || '<span class="dim-turno-chip">Sem quebra por turno</span>'}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="dim-unit-card">
+      <div class="dim-unit-head">
+        <span class="dim-unit-name">${esc(cd.unidade)}</span>
+        <span class="dim-card-gap-badge ${badge.cls}">${esc(badge.label)}</span>
+      </div>
+      <div class="dim-unit-sub">${fmtNum(cd.sol)} solicitados · ${fmtNum(cd.con)} contratados</div>
+      <div class="dim-unit-setores">${tiles}</div>
+    </div>`;
+}
+function renderDimensionamento(){
+  const kpiEl = document.getElementById('dimKpis');
+  const cardsEl = document.getElementById('dimCards');
+
+  let dimData = DIM_DADOS.filter(d=> !state.unidade || d.unidade===state.unidade);
+  let dimCargoData = DIM_CARGO_DADOS.filter(d=> !state.unidade || d.unidade===state.unidade);
+  if(state.cargo){
+    dimData = dimData.filter(d=>d.cargo===state.cargo);
+    dimCargoData = dimCargoData.filter(d=>d.cargo===state.cargo);
+  }
+  let turnoUnsupported = false;
+  if(state.turno){
+    const anyMatch = dimCargoData.some(d=> turnoKeyMatch(d.turnos, state.turno) !== undefined);
+    if(!anyMatch) turnoUnsupported = true;
+  }
+  if(dimData.length===0 || turnoUnsupported){
+    const motivo = turnoUnsupported
+      ? `Não há quadro solicitado definido para o turno "${state.turno}" no Dimensionamento (turno sem headcount fixo aprovado nesta fonte).`
+      : 'Nenhum Setor/Cargo corresponde à combinação de filtros ativa.';
+    kpiEl.innerHTML = noDataBlock(motivo);
+    cardsEl.innerHTML = '';
+    return;
+  }
+
+  function effectiveVals(cargoNome){
+    const cargoRow = dimCargoData.find(d=>d.cargo===cargoNome);
+    const base = dimData.find(d=>d.cargo===cargoNome) || {solicitado:0,contratado:0};
+    if(state.turno && cargoRow){
+      const key = turnoKeyMatch(cargoRow.turnos, state.turno);
+      if(key){ return {solicitado:cargoRow.turnos[key].solicitado, contratado:cargoRow.turnos[key].contratado}; }
+      return {solicitado:0, contratado:0};
+    }
+    return {solicitado: base.solicitado, contratado: base.contratado};
+  }
+
+  let totSol=0, totCon=0;
+  const byUnidade = {};
+  dimData.forEach(d=>{
+    const v = effectiveVals(d.cargo);
+    totSol += v.solicitado; totCon += v.contratado;
+    byUnidade[d.unidade] = byUnidade[d.unidade] || {sol:0,con:0};
+    byUnidade[d.unidade].sol += v.solicitado; byUnidade[d.unidade].con += v.contratado;
+  });
+  const gapUnidsSet = new Set(), atendUnidsSet = new Set();
+  Object.keys(byUnidade).forEach(u=>{
+    if(byUnidade[u].con < byUnidade[u].sol) gapUnidsSet.add(u); else atendUnidsSet.add(u);
+  });
+  const gapTotal = totSol - totCon;
+  const pctAtend = totSol>0 ? (totCon/totSol*100) : 100;
+
+  kpiEl.innerHTML = `
+    <div class="kpi acc-indigo"><div class="kpi-label">Vagas Solicitadas</div><div class="kpi-value">${fmtNum(totSol)}</div></div>
+    <div class="kpi"><div class="kpi-label">Colaboradores Contratados</div><div class="kpi-value">${fmtNum(totCon)}</div><div class="kpi-sub">${fmtPct(pctAtend)} atendido</div></div>
+    <div class="kpi ${gapTotal>0?'acc-red':'acc-green'}"><div class="kpi-label">GAP Total</div><div class="kpi-value">${gapTotal>0?fmtNum(gapTotal):('+'+fmtNum(-gapTotal))}</div><div class="kpi-sub">${gapTotal>0?'posições em aberto':'excedente'}</div></div>
+    <div class="kpi acc-amber"><div class="kpi-label">Unidades com GAP</div><div class="kpi-value">${gapUnidsSet.size}</div></div>
+    <div class="kpi acc-green"><div class="kpi-label">Unidades Atendidas</div><div class="kpi-value">${atendUnidsSet.size}</div></div>
+  `;
+
+  const unidsList = Array.from(new Set(dimData.map(d=>d.unidade)));
+  const cardsData = unidsList.map(u=>{
+    const rows = dimData.filter(d=>d.unidade===u);
+    let sol=0,con=0;
+    rows.forEach(d=>{ const v=effectiveVals(d.cargo); sol+=v.solicitado; con+=v.contratado; });
+    const pct = sol>0 ? (con/sol*100) : 100;
+    return {unidade:u, rows, sol, con, pct};
+  });
+  if(!state.unidade) cardsData.sort((a,b)=>a.pct-b.pct);
+
+  cardsEl.innerHTML = cardsData.map(cd=>renderDimUnitCard(cd, dimCargoData, effectiveVals)).join('');
+}
+
+/* ============================================================
+   9. PRESENÇA DIÁRIA OPERACIONAL (#sec-presenca-operacional, seção 5-B)
+   ============================================================ */
+function operClass(pct){
+  if(pct>=100) return 'op-exc';
+  if(pct>=90) return 'op-ok';
+  if(pct>=70) return 'op-warn';
+  return 'op-crit';
+}
+function renderOperGrid(){
+  const container = document.getElementById('operContainer');
+  let groups = OPER_DADOS.filter(g=> (!state.unidade || g.unidade===state.unidade) && (!state.turno || g.turno===state.turno));
+  if(state.cargo){
+    groups = groups.map(g=>Object.assign({}, g, {grupos: g.grupos.filter(gr=>gr.cargo===state.cargo)})).filter(g=>g.grupos.length>0);
+  }
+  if(groups.length===0){
+    container.innerHTML = noDataBlock('Nenhum grupo Setor/Turno corresponde à combinação de filtros ativa na Presença Diária Operacional.');
+    return;
+  }
+
+  const days = periodDays(state.mes);
+  const totalSubW = OPER_COLW.setor + OPER_COLW.cargo + OPER_COLW.solicitado;
+
+  let colgroup = `<colgroup><col style="width:${totalSubW}px">`;
+  days.forEach(()=> colgroup += `<col style="width:34px">`);
+  colgroup += `<col style="width:78px"><col style="width:78px"></colgroup>`;
+
+  const subColCSS = `<style>
+    #operGrid .stc-flex{width:${totalSubW}px;}
+    #operGrid .stc-flex>div:nth-child(1){flex:0 0 ${OPER_COLW.setor}px;}
+    #operGrid .stc-flex>div:nth-child(2){flex:0 0 ${OPER_COLW.cargo}px;}
+    #operGrid .stc-flex>div:nth-child(3){flex:0 0 ${OPER_COLW.solicitado}px;}
+  </style>`;
+
+  let thead = '<thead><tr>';
+  thead += `<th class="stcol"><div class="stc-flex"><div>Setor</div><div>Cargo</div><div>Solicitado</div></div></th>`;
+  days.forEach(iso=>{
+    const wknd = isWeekend(iso) ? ' col-weekend-head' : '';
+    thead += `<th class="${wknd}">${fmtDateShort(iso)}<br>${weekdayAbbrev(iso)}</th>`;
+  });
+  thead += `<th class="tot-head">Média<br>Realizado</th><th class="tot-head">% Médio<br>Atendido</th>`;
+  thead += '</tr></thead>';
+
+  let tbody = '<tbody>';
+  groups.forEach(g=>{
+    tbody += `<tr class="grp-header"><td class="stcol">${esc(g.unidade)} — ${esc(g.turno)}</td><td colspan="${days.length+2}"></td></tr>`;
+
+    let turnoSolTotal = 0;
+    g.grupos.forEach(gr=> turnoSolTotal += gr.solicitado);
+
+    const dayAgg = days.map(iso=>{
+      if(isFutureDay(iso)) return null;
+      let sol=0, real=0, any=false;
+      g.grupos.forEach(gr=>{
+        if(Object.prototype.hasOwnProperty.call(gr.realizado, iso)){ any=true; real += gr.realizado[iso]; sol += gr.solicitado; }
+      });
+      if(!any) return null;
+      const pct = sol>0 ? (real/sol*100) : 100;
+      return {sol, real, pct};
+    });
+
+    let sumPctDays=0, cntPctDays=0;
+    dayAgg.forEach(a=>{ if(a){ sumPctDays+=a.pct; cntPctDays++; } });
+    const turnoAvgPct = cntPctDays>0 ? sumPctDays/cntPctDays : null;
+
+    const pctRowCells = dayAgg.map(a=> a===null ? '<td class="st-empty">·</td>' : `<td class="${operClass(a.pct)}">${a.pct.toFixed(0)}%</td>`).join('');
+    tbody += `<tr class="oper-pct-row"><td class="stcol"><div class="stc-flex"><div>% Presença</div><div>${esc(g.turno)}</div><div></div></div></td>${pctRowCells}<td>—</td><td class="${turnoAvgPct!=null?operClass(turnoAvgPct):''}">${turnoAvgPct!=null?turnoAvgPct.toFixed(1)+'%':'·'}</td></tr>`;
+
+    let realSumForAvg=0, realCountForAvg=0;
+    const totalCells = dayAgg.map(a=>{
+      if(a===null) return '<td class="st-empty">·</td>';
+      realSumForAvg += a.real; realCountForAvg++;
+      return `<td class="${operClass(a.pct)}">${a.real}</td>`;
+    }).join('');
+    const mediaReal = realCountForAvg>0 ? realSumForAvg/realCountForAvg : null;
+    tbody += `<tr class="oper-total-row"><td class="stcol"><div class="stc-flex"><div>TOTAL</div><div></div><div>${turnoSolTotal}</div></div></td>${totalCells}<td>${mediaReal!=null?mediaReal.toFixed(1):'·'}</td><td class="${turnoAvgPct!=null?operClass(turnoAvgPct):''}">${turnoAvgPct!=null?turnoAvgPct.toFixed(1)+'%':'·'}</td></tr>`;
+
+    g.grupos.forEach(gr=>{
+      let sumR=0, cntR=0;
+      const cells = days.map(iso=>{
+        if(!Object.prototype.hasOwnProperty.call(gr.realizado, iso)) return '<td class="st-empty">·</td>';
+        const real = gr.realizado[iso];
+        sumR+=real; cntR++;
+        const pct = gr.solicitado>0 ? (real/gr.solicitado*100) : 100;
+        const title = `${gr.setor} — ${gr.cargo} — Solicitado: ${gr.solicitado} · Realizado: ${real} (${pct.toFixed(0)}%)`;
+        return `<td class="${operClass(pct)}" title="${esc(title)}">${real}</td>`;
+      }).join('');
+      const media = cntR>0 ? sumR/cntR : null;
+      const pctMedio = cntR>0 ? (gr.solicitado>0 ? (media/gr.solicitado*100) : 100) : null;
+      tbody += `<tr><td class="stcol"><div class="stc-flex"><div style="color:${setorColor(gr.setor)}">${esc(gr.setor)}</div><div style="color:${cargoColor(gr.cargo)}">${esc(gr.cargo)}</div><div>${gr.solicitado}</div></div></td>${cells}<td>${media!=null?media.toFixed(1):'·'}</td><td class="${pctMedio!=null?operClass(pctMedio):''}">${pctMedio!=null?pctMedio.toFixed(1)+'%':'·'}</td></tr>`;
+    });
+  });
+  tbody += '</tbody>';
+
+  container.innerHTML = subColCSS + `
+    <div class="table-scroll-controls">
+      <button class="arrow-btn" id="operArrowL">◀</button>
+      <button class="arrow-btn" id="operArrowR">▶</button>
+    </div>
+    <div class="uni-scroll" id="operGrid"><table class="tgrade-uni">${colgroup}${thead}${tbody}</table></div>
+    <div class="grade-legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--blue-light)"></span>op-exc — ≥100% atendido</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--green-bg)"></span>op-ok — ≥90%</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--amber-bg)"></span>op-warn — ≥70%</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--red-bg)"></span>op-crit — &lt;70%</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#F3F5F8"></span>Fim de semana</div>
+    </div>`;
+  wireArrowButtons('operArrowL','operArrowR','operGrid');
+}
+
+/* ============================================================
+   10. GRADE DIÁRIA (RH) — seção 5-A
+   ============================================================ */
+function renderGradeRH(){
+  const container = document.getElementById('gradeContainer');
+  let groups = DADOS.filter(g=> (!state.unidade || g.unidade===state.unidade) && (!state.turno || g.turno===state.turno));
+  if(groups.length===0){
+    container.innerHTML = noDataBlock('Nenhum grupo Unidade/Turno corresponde à combinação de filtros ativa.');
+    return;
+  }
+  const days = periodDays(state.mes);
+  const singleMonth = !!state.mes;
+  const activeMonthNums = singleMonth ? [MES_NUM[state.mes]] : MESES.map(m=>MES_NUM[m]);
+
+  const totalSubW = GRADE_COLW.colab + GRADE_COLW.unidade + GRADE_COLW.cargo + GRADE_COLW.turno;
+  let colgroup = `<colgroup><col style="width:${totalSubW}px">`;
+  days.forEach(()=> colgroup += `<col style="width:30px">`);
+  colgroup += `<col style="width:78px"><col style="width:78px"><col style="width:78px"><col style="width:78px"></colgroup>`;
+
+  const extraCSS = `<style>
+    #gradeRH .stc-flex{width:${totalSubW}px;}
+    #gradeRH .stc-flex>div:nth-child(1){flex:0 0 ${GRADE_COLW.colab}px;}
+    #gradeRH .stc-flex>div:nth-child(2){flex:0 0 ${GRADE_COLW.unidade}px;}
+    #gradeRH .stc-flex>div:nth-child(3){flex:0 0 ${GRADE_COLW.cargo}px;}
+    #gradeRH .stc-flex>div:nth-child(4){flex:0 0 ${GRADE_COLW.turno}px;}
+  </style>`;
+
+  const allVisibleColabs = [];
+  groups.forEach(g=> g.colaboradores.forEach(c=>{
+    if(state.cargo && c.cargo!==state.cargo) return;
+    const activeHere = activeMonthNums.some(m=>isColabActiveForMonth(c,m));
+    if(activeHere) allVisibleColabs.push(c);
+  }));
+  const folgaGeralSet = new Set();
+  days.forEach(iso=>{
+    if(isFutureDay(iso)) return;
+    if(allVisibleColabs.length===0) return;
+    const algumP = allVisibleColabs.some(c=> c.dias && c.dias[iso]==='P');
+    if(!algumP) folgaGeralSet.add(iso);
+  });
+
+  let thead = '<thead><tr>';
+  thead += `<th class="stcol"><div class="stc-flex"><div>Colaborador</div><div>Unidade</div><div>Cargo</div><div>Turno</div></div></th>`;
+  days.forEach(iso=>{
+    const wknd = isWeekend(iso) ? ' col-weekend-head' : '';
+    const fg = folgaGeralSet.has(iso) ? ' folga-geral' : '';
+    thead += `<th class="${wknd}${fg}">${fmtDateShort(iso)}<br>${weekdayAbbrev(iso)}</th>`;
+  });
+  thead += `<th class="tot-head">Total<br>Presenças</th><th class="tot-head">Total<br>Faltas Just.</th><th class="tot-head">Total<br>Faltas Injust.</th><th class="tot-head">Total<br>Folgas</th>`;
+  thead += '</tr></thead>';
+
+  let tbody = '<tbody>';
+  groups.forEach(g=>{
+    const colabs = g.colaboradores.filter(c=>{
+      if(state.cargo && c.cargo!==state.cargo) return false;
+      return activeMonthNums.some(m=>isColabActiveForMonth(c,m));
+    });
+    if(colabs.length===0) return;
+
+    tbody += `<tr class="grp-header"><td class="stcol">${esc(g.unidade)} — ${esc(g.turno)}</td><td colspan="${days.length+4}"></td></tr>`;
+
+    const resumoDefs = [
+      {code:'FER', label:'Feriado', cls:'r-fer'},
+      {code:'FERIAS', label:'Férias', cls:'r-ferias'},
+      {code:'FOLGA', label:'Folga', cls:'r-flg'},
+      {code:'D', label:'Desligado', cls:'r-des'},
+      {code:'FI', label:'Falta Injustificada (FI)', cls:'r-fi'},
+      {code:'FJ', label:'Falta Justificada (FJ)', cls:'r-fj'},
+      {code:'P', label:'Presença', cls:'r-p'},
+    ];
+    resumoDefs.forEach(def=>{
+      let cells = '';
+      days.forEach(iso=>{
+        if(isFutureDay(iso)){ cells += '<td class="st-empty">·</td>'; return; }
+        const mnum = +iso.slice(5,7);
+        let cnt = 0;
+        colabs.forEach(c=>{
+          if(!isColabActiveForMonth(c, mnum)) return;
+          let st = c.dias ? c.dias[iso] : undefined;
+          if(def.code==='FI' && st==='AT') st='FI';
+          if(st===def.code) cnt++;
+        });
+        cells += `<td>${cnt||''}</td>`;
+      });
+      tbody += `<tr class="tr-res-label ${def.cls}"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">${esc(def.label)}</div></div></td>${cells}<td></td><td></td><td></td><td></td></tr>`;
+    });
+
+    let pctCells = '';
+    days.forEach(iso=>{
+      if(isFutureDay(iso)){ pctCells += '<td class="st-empty">·</td>'; return; }
+      const mnum = +iso.slice(5,7);
+      const c = {P:0,FJ:0,FI:0,AT:0};
+      colabs.forEach(cb=>{
+        if(!isColabActiveForMonth(cb, mnum)) return;
+        const st = cb.dias ? cb.dias[iso] : undefined;
+        if(c[st]!==undefined) c[st]++;
+      });
+      const hasAny = (c.P+c.FJ+c.FI+c.AT)>0;
+      const pct = pctPresencaFromCounts(c);
+      pctCells += hasAny ? `<td>${pct.toFixed(1)}%</td>` : '<td class="st-empty">·</td>';
+    });
+    tbody += `<tr class="tr-res-label r-pct"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">% de Presença</div></div></td>${pctCells}<td></td><td></td><td></td><td></td></tr>`;
+
+    colabs.forEach(c=>{
+      const nomeShort = c.nome.length>16 ? c.nome.slice(0,16)+'…' : c.nome;
+      let cells = '';
+      let tP=0,tFJ=0,tFI=0,tFLG=0;
+      days.forEach(iso=>{
+        const mnum = +iso.slice(5,7);
+        const active = isColabActiveForMonth(c, mnum);
+        const st = c.dias ? c.dias[iso] : undefined;
+        if(st===undefined){ cells += '<td class="st-empty">·</td>'; return; }
+        const heInfo = c.he && c.he[iso];
+        const heCls = heInfo ? ' he-mark' : '';
+        let title = '';
+        if(heInfo){
+          const ex50 = hhmmToDecimal(heInfo.ex50), ex100 = hhmmToDecimal(heInfo.ex100);
+          const total = decimalToHHMM(ex50+ex100);
+          title = ` title="Hora extra: ${total} (50%: ${heInfo.ex50||'00:00'} · 100%: ${heInfo.ex100||'00:00'})"`;
+        }
+        const wknd = isWeekend(iso) ? ' col-weekend' : '';
+        cells += `<td class="mc-${st.toLowerCase()}${heCls}${wknd}"${title}>${esc(st)}</td>`;
+        if(active){
+          if(st==='P') tP++;
+          else if(st==='FJ') tFJ++;
+          else if(st==='FI'||st==='AT') tFI++;
+          else if(st==='FOLGA') tFLG++;
+        }
+      });
+      tbody += `<tr>
+        <td class="stcol"><div class="stc-flex">
+          <div class="colab-name" title="${esc(c.nome)}">${esc(nomeShort)}</div>
+          <div class="unidade-cell">${esc(g.unidade)}</div>
+          <div class="cargo-cell" style="color:${cargoColor(c.cargo)}">${esc(c.cargo)}</div>
+          <div class="turno-cell">${esc(g.turno)}</div>
+        </div></td>
+        ${cells}
+        <td class="tot-p">${tP}</td><td class="tot-fj">${tFJ}</td><td class="tot-fi">${tFI}</td><td class="tot-flg">${tFLG}</td>
+      </tr>`;
+    });
+  });
+  tbody += '</tbody>';
+
+  container.innerHTML = extraCSS + `
+    <div class="table-scroll-controls">
+      <button class="arrow-btn" id="gradeArrowL">◀</button>
+      <button class="arrow-btn" id="gradeArrowR">▶</button>
+    </div>
+    <div class="uni-scroll" id="gradeRH"><table class="tgrade-uni">${colgroup}${thead}${tbody}</table></div>
+    <div class="grade-legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:#0E7A43"></span>P — Presença</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#B45309"></span>FJ — Falta Justificada</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#C0281C"></span>FI — Falta Injustificada</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#64748B"></span>FOLGA — Folga</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#6B21A8"></span>FER — Feriado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#0079C2"></span>FERIAS — Férias</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#334155"></span>D — Desligado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#C0281C"></span>AT — Afastamento/Atestado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#2D5099"></span>INT — Integração/Treinamento</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#64748B"></span>Fim de semana</div>
+      <div class="legend-item"><span class="legend-dot"></span>Hora Extra (passe o mouse sobre a célula)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#ED0000"></span>Folga Geral (ninguém trabalhou)</div>
+    </div>`;
+  wireArrowButtons('gradeArrowL','gradeArrowR','gradeRH');
+}
+
+/* ============================================================
+   11. VISÃO GERAL — KPIs (#sec-kpi)
+   ============================================================ */
+function renderKPIs(){
+  const el = document.getElementById('kpiGeral');
+  const opts = {unidade:state.unidade, mes:state.mes, turno:state.turno, cargo:state.cargo};
+  const rows = collectDayStatuses(opts);
+  const counts = countStatuses(rows);
+  const pct = pctPresencaFromCounts(counts);
+  const fiEff = counts.FI + counts.AT;
+  const denom = counts.P + counts.FJ + fiEff;
+  const absent = denom>0 ? +((counts.FJ+fiEff)/denom*100).toFixed(1) : 0;
+
+  const colabs = collectColabs(opts);
+  const unidsPresentes = new Set();
+  DADOS.forEach(g=>{ if(!state.unidade||g.unidade===state.unidade) unidsPresentes.add(g.unidade); });
+
+  let dimData = DIM_DADOS.filter(d=> !state.unidade || d.unidade===state.unidade);
+  let dimCargoData = DIM_CARGO_DADOS.filter(d=> !state.unidade || d.unidade===state.unidade);
+  if(state.cargo){ dimData = dimData.filter(d=>d.cargo===state.cargo); dimCargoData = dimCargoData.filter(d=>d.cargo===state.cargo); }
+  let dimTurnoOk = true;
+  if(state.turno){ dimTurnoOk = dimCargoData.some(d=>turnoKeyMatch(d.turnos, state.turno)!==undefined); }
+  function effVals(cargoNome){
+    const row = dimCargoData.find(d=>d.cargo===cargoNome);
+    const base = dimData.find(d=>d.cargo===cargoNome) || {solicitado:0,contratado:0};
+    if(state.turno && row){
+      const key = turnoKeyMatch(row.turnos, state.turno);
+      if(key) return row.turnos[key];
+      return {solicitado:0,contratado:0};
+    }
+    return {solicitado:base.solicitado, contratado:base.contratado};
+  }
+  let totSol=0, totCon=0;
+  const byUnidade = {};
+  if(dimTurnoOk){
+    dimData.forEach(d=>{ const v=effVals(d.cargo); totSol+=v.solicitado; totCon+=v.contratado; byUnidade[d.unidade]=byUnidade[d.unidade]||{sol:0,con:0}; byUnidade[d.unidade].sol+=v.solicitado; byUnidade[d.unidade].con+=v.contratado; });
+  }
+  const gapTotal = totSol-totCon;
+  const unidsComGap = Object.keys(byUnidade).filter(u=>byUnidade[u].con<byUnidade[u].sol).length;
+
+  const presRows = PRESENCA_DADOS.filter(p=>{
+    if(state.unidade && p.unidade!==state.unidade) return false;
+    if(state.mes && monthNameFromISO(p.data)!==state.mes) return false;
+    return true;
+  });
+  const admissoes = presRows.filter(p=>p.tipo==='Admissão').length;
+  const desligamentos = presRows.filter(p=>p.tipo==='Desligamento').length;
+
+  const cards = [
+    {label:'Presenças Efetivas', value:fmtNum(counts.P), sub:`${fmtNum(denom)} previstas`, acc:''},
+    {label:'Taxa de Presença', value:fmtPct(pct), sub:'', acc:'acc-green'},
+    {label:'% Absenteísmo', value:fmtPct(absent), sub:'', acc:'acc-red'},
+    {label:'Faltas Justificadas (FJ)', value:fmtNum(counts.FJ), sub: denom>0? fmtPct(+(counts.FJ/denom*100).toFixed(1))+' do total':'', acc:'acc-amber'},
+    {label:'Faltas Injustificadas (FI)', value:fmtNum(fiEff), sub: denom>0? fmtPct(+(fiEff/denom*100).toFixed(1))+' do total':'', acc:'acc-red'},
+    {label:'Nº de Unidades', value:fmtNum(unidsPresentes.size), sub:'', acc:'acc-indigo'},
+    {label:'Nº de Colaboradores', value:fmtNum(colabs.length), sub:'', acc:'acc-indigo'},
+    {label:'Vagas Solicitadas × Contratadas', value:`${fmtNum(totSol)} × ${fmtNum(totCon)}`, sub: dimTurnoOk?'':'sem quadro p/ turno selecionado', acc:''},
+    {label:'GAP de Posições em Aberto', value: gapTotal>0? fmtNum(gapTotal) : ('+'+fmtNum(-gapTotal)), sub: gapTotal>0?'em aberto':'excedente', acc: gapTotal>0?'acc-red':'acc-green'},
+    {label:'Unidades com GAP', value:fmtNum(unidsComGap), sub:'', acc:'acc-amber'},
+    {label:'Presenças Totais', value:fmtNum(counts.P), sub:'', acc:''},
+    {label:'Desligamentos', value:fmtNum(desligamentos), sub:'', acc:'acc-red'},
+    {label:'Admissões', value:fmtNum(admissoes), sub:'', acc:'acc-green'},
+    {label:'Dimensionamento Total', value:`${fmtNum(totCon)}/${fmtNum(totSol)}`, sub:'contratado/solicitado', acc:'acc-indigo'},
+  ];
+  el.innerHTML = cards.map(c=>`<div class="kpi ${c.acc}"><div class="kpi-label">${esc(c.label)}</div><div class="kpi-value">${c.value}</div>${c.sub?`<div class="kpi-sub">${esc(c.sub)}</div>`:''}</div>`).join('');
+}
+
+/* ============================================================
+   12. GRÁFICOS (#sec-graficos)
+   ============================================================ */
+function renderGraficos(){
+  const el = document.getElementById('graficosContainer');
+  el.innerHTML = `
+    <div class="ch"><h3>% Presença por Unidade</h3><div class="ch-canvas-wrap"><canvas id="chPresUnidade"></canvas></div></div>
+    <div class="ch"><h3>Presenças × Faltas (FJ+FI) por Unidade</h3><div class="ch-canvas-wrap"><canvas id="chPresFaltas"></canvas></div></div>
+    <div class="ch"><h3>% Presença por Turno</h3><div class="ch-canvas-wrap"><canvas id="chPresTurno"></canvas></div></div>
+    <div class="ch"><h3>% Presença por Setor</h3><div class="ch-canvas-wrap"><canvas id="chPresSetor"></canvas></div></div>
+  `;
+  function statsBy(dimFn){
+    const buckets = {};
+    const opts = {unidade:state.unidade, mes:state.mes, turno:state.turno, cargo:state.cargo};
+    collectDayStatuses(opts).forEach(r=>{
+      const key = dimFn(r);
+      buckets[key] = buckets[key] || {P:0,FJ:0,FI:0,FOLGA:0,FER:0,FERIAS:0,D:0,AT:0,INT:0};
+      if(buckets[key][r.status]!==undefined) buckets[key][r.status]++;
+    });
+    return buckets;
+  }
+  renderChartSafe('chPresUnidade','% Presença por Unidade', ()=>{
+    const buckets = statsBy(r=>r.unidade);
+    const labels = Object.keys(buckets);
+    const pcts = labels.map(l=>pctPresencaFromCounts(buckets[l]));
+    const media = pcts.length? +(pcts.reduce((a,b)=>a+b,0)/pcts.length).toFixed(1) : 0;
+    destroyChart('presUnidade');
+    charts.presUnidade = new Chart(document.getElementById('chPresUnidade'), {
+      data:{labels, datasets:[
+        {type:'bar', label:'% Presença', data:pcts, backgroundColor:'#0079C2', order:2},
+        {type:'line', label:'Média Geral', data:labels.map(()=>media), borderColor:'#C0281C', borderWidth:1.5, pointRadius:0, order:1}
+      ]},
+      options:{responsive:true, maintainAspectRatio:false,
+        scales:{y:{beginAtZero:true, max:100, ticks:{callback:v=>v+'%'}}},
+        plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{unit:'pct'}}}
+    });
+  });
+  renderChartSafe('chPresFaltas','Presenças × Faltas por Unidade', ()=>{
+    const buckets = statsBy(r=>r.unidade);
+    const labels = Object.keys(buckets);
+    const pres = labels.map(l=>buckets[l].P);
+    const faltas = labels.map(l=>buckets[l].FJ+buckets[l].FI+buckets[l].AT);
+    const mediaPres = pres.length? +(pres.reduce((a,b)=>a+b,0)/pres.length).toFixed(1):0;
+    destroyChart('presFaltas');
+    charts.presFaltas = new Chart(document.getElementById('chPresFaltas'), {
+      data:{labels, datasets:[
+        {type:'bar', label:'Presenças', data:pres, backgroundColor:'#0E7A43'},
+        {type:'bar', label:'Faltas (FJ+FI)', data:faltas, backgroundColor:'#C0281C'},
+        {type:'line', label:'Média Presenças', data:labels.map(()=>mediaPres), borderColor:'#1E3A6E', borderWidth:1.5, pointRadius:0}
+      ]},
+      options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}},
+        plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{}}}
+    });
+  });
+  renderChartSafe('chPresTurno','% Presença por Turno', ()=>{
+    const buckets = statsBy(r=>r.turno);
+    const labels = TURNOS.filter(t=>buckets[t]);
+    const pcts = labels.map(l=>pctPresencaFromCounts(buckets[l]));
+    const media = pcts.length? +(pcts.reduce((a,b)=>a+b,0)/pcts.length).toFixed(1):0;
+    destroyChart('presTurno');
+    charts.presTurno = new Chart(document.getElementById('chPresTurno'), {
+      data:{labels, datasets:[
+        {type:'bar', label:'% Presença', data:pcts, backgroundColor:'#2D5099'},
+        {type:'line', label:'Média Geral', data:labels.map(()=>media), borderColor:'#C0281C', borderWidth:1.5, pointRadius:0}
+      ]},
+      options:{responsive:true, maintainAspectRatio:false,
+        scales:{y:{beginAtZero:true, max:100, ticks:{callback:v=>v+'%'}}, x:{ticks:{font:{size:9}}}},
+        plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{unit:'pct'}}}
+    });
+  });
+  renderChartSafe('chPresSetor','% Presença por Setor', ()=>{
+    const buckets = statsBy(r=>r.cargo);
+    const labels = CARGOS.filter(c=>buckets[c]);
+    const pcts = labels.map(l=>pctPresencaFromCounts(buckets[l]));
+    const media = pcts.length? +(pcts.reduce((a,b)=>a+b,0)/pcts.length).toFixed(1):0;
+    destroyChart('presSetor');
+    charts.presSetor = new Chart(document.getElementById('chPresSetor'), {
+      data:{labels, datasets:[
+        {type:'bar', label:'% Presença', data:pcts, backgroundColor:'#6B21A8'},
+        {type:'line', label:'Média Geral', data:labels.map(()=>media), borderColor:'#C0281C', borderWidth:1.5, pointRadius:0}
+      ]},
+      options:{responsive:true, maintainAspectRatio:false,
+        scales:{y:{beginAtZero:true, max:100, ticks:{callback:v=>v+'%'}}},
+        plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{unit:'pct'}}}
+    });
+  });
+}
+
+/* ============================================================
+   13. EVOLUÇÃO (#sec-evolucao)
+   ============================================================ */
+function renderEvolucao(){
+  const chEl = document.getElementById('evolucaoCharts');
+  const tabEl = document.getElementById('evolucaoTabela');
+  chEl.innerHTML = `
+    <div class="ch"><h3>% Presença — Evolução Diária</h3><div class="ch-canvas-wrap"><canvas id="chEvolDia"></canvas></div></div>
+    <div class="ch"><h3>Presenças, FJ e FI — Evolução Mensal</h3><div class="ch-canvas-wrap"><canvas id="chEvolMes"></canvas></div></div>
+  `;
+  const days = periodDays(state.mes).filter(iso=>!isFutureDay(iso));
+  const opts0 = {unidade:state.unidade, turno:state.turno, cargo:state.cargo};
+
+  renderChartSafe('chEvolDia','% Presença — Evolução Diária', ()=>{
+    const pcts = days.map(iso=>{
+      const mnum = +iso.slice(5,7);
+      const mesName = Object.keys(MES_NUM).find(k=>MES_NUM[k]===mnum);
+      const rows = collectDayStatuses(Object.assign({}, opts0, {mes:mesName})).filter(r=>r.date===iso);
+      return pctPresencaFromCounts(countStatuses(rows));
+    });
+    destroyChart('evolDia');
+    charts.evolDia = new Chart(document.getElementById('chEvolDia'), {
+      type:'line',
+      data:{labels: days.map(fmtDateShort), datasets:[{label:'% Presença', data:pcts, borderColor:'#0079C2', backgroundColor:'rgba(0,121,194,.12)', fill:true, tension:.25, pointRadius:2}]},
+      options:{responsive:true, maintainAspectRatio:false,
+        scales:{y:{beginAtZero:true, max:100, ticks:{callback:v=>v+'%'}}, x:{ticks:{maxRotation:90, minRotation:60, autoSkip:true, maxTicksLimit:20, font:{size:9}}}},
+        plugins:{legend:{display:false}}}
+    });
+  });
+  renderChartSafe('chEvolMes','Presenças, FJ e FI — Evolução Mensal', ()=>{
+    const meses = state.mes? [state.mes] : MESES;
+    const rowsPerMes = meses.map(m=>countStatuses(collectDayStatuses(Object.assign({}, opts0, {mes:m}))));
+    destroyChart('evolMes');
+    charts.evolMes = new Chart(document.getElementById('chEvolMes'), {
+      data:{labels:meses, datasets:[
+        {type:'bar', label:'Presenças', data:rowsPerMes.map(c=>c.P), backgroundColor:'#0E7A43'},
+        {type:'bar', label:'FJ', data:rowsPerMes.map(c=>c.FJ), backgroundColor:'#B45309'},
+        {type:'bar', label:'FI', data:rowsPerMes.map(c=>c.FI+c.AT), backgroundColor:'#C0281C'},
+      ]},
+      options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}},
+        plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}, barValuePlugin:{}}}
+    });
+  });
+
+  const meses = state.mes? [state.mes] : MESES;
+  const rowsHtml = meses.map(m=>{
+    const c = countStatuses(collectDayStatuses(Object.assign({}, opts0, {mes:m})));
+    const pct = pctPresencaFromCounts(c);
+    return `<tr><td>${esc(m)}/2026</td><td>${fmtNum(c.P)}</td><td>${fmtNum(c.FJ)}</td><td>${fmtNum(c.FI+c.AT)}</td><td>${fmtPct(pct)}</td></tr>`;
+  }).join('');
+  tabEl.innerHTML = `
+    <div class="table-wrap"><div class="table-scroll">
+    <table class="std-table">
+      <thead><tr><th>Mês</th><th>Presenças</th><th>FJ</th><th>FI</th><th>% Presença</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table></div></div>`;
+}
+
+/* ============================================================
+   14. MOVIMENTAÇÕES (#sec-presenca)
+   ============================================================ */
+function renderMovimentacoes(){
+  const el = document.getElementById('movimContainer');
+  if(state.turno || state.cargo){
+    el.innerHTML = noDataBlock('Movimentações são agregadas por Unidade/Mês, sem quebra por Turno ou Cargo na fonte de origem.');
+    return;
+  }
+  let rows = PRESENCA_DADOS.filter(p=>{
+    if(state.unidade && p.unidade!==state.unidade) return false;
+    if(state.mes && monthNameFromISO(p.data)!==state.mes) return false;
+    return true;
+  });
+  rows = rows.slice().sort((a,b)=> a.data<b.data?-1:(a.data>b.data?1:0));
+  const trs = rows.map(p=>{
+    const mes = monthNameFromISO(p.data);
+    const isAdm = p.tipo==='Admissão';
+    return `<tr>
+      <td>${esc(p.unidade)}</td>
+      <td>${esc(mes)}</td>
+      <td class="dim-adm">${isAdm? esc(p.colaborador) : '—'}</td>
+      <td>${isAdm? fmtDateShort(p.data) : '—'}</td>
+      <td class="dim-des">${!isAdm? esc(p.colaborador) : '—'}</td>
+      <td>${!isAdm? fmtDateShort(p.data) : '—'}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="table-wrap"><div class="table-scroll">
+    <table class="std-table">
+      <thead><tr><th>Unidade Operacional</th><th>Mês</th><th>Colaborador Admitido</th><th>Data de Admissão</th><th>Colaborador Demitido</th><th>Data de Demissão</th></tr></thead>
+      <tbody>${trs || '<tr><td colspan="6" style="text-align:center;color:var(--tx-secondary)">Nenhum evento no período filtrado.</td></tr>'}</tbody>
+    </table></div></div>`;
+}
+
+/* ============================================================
+   15. RESUMO (#sec-resumo)
+   ============================================================ */
+function renderResumo(){
+  const el = document.getElementById('resumoContainer');
+  const meses = state.mes? [state.mes] : MESES;
+  const rows = [];
+  DADOS.forEach(g=>{
+    if(state.unidade && g.unidade!==state.unidade) return;
+    if(state.turno && g.turno!==state.turno) return;
+    meses.forEach(m=>{
+      const opts = {unidade:g.unidade, turno:g.turno, mes:m, cargo:state.cargo};
+      const c = countStatuses(collectDayStatuses(opts));
+      const pct = pctPresencaFromCounts(c);
+      const fiEff = c.FI + c.AT;
+      const denom = c.P + c.FJ + fiEff;
+      const absent = denom>0 ? +((c.FJ+fiEff)/denom*100).toFixed(1) : 0;
+      const faltas = c.FJ + fiEff;
+      if(denom===0 && c.FOLGA===0 && c.D===0 && c.FER===0 && c.FERIAS===0) return;
+      let statusCls='ok', statusLabel='Excelente';
+      if(pct<85){ statusCls='crit'; statusLabel='Crítico'; }
+      else if(pct<95){ statusCls='warn'; statusLabel='Atenção'; }
+      rows.push({unidade:g.unidade, mes:m, turno:g.turno, pct, absent, P:c.P, FJ:c.FJ, FI:fiEff, faltas, statusCls, statusLabel});
+    });
+  });
+  const trs = rows.map(r=>`<tr>
+    <td>${esc(r.unidade)}</td><td>${esc(r.mes)}</td><td>${esc(r.turno)}</td>
+    <td>${fmtPct(r.pct)}</td><td>${fmtPct(r.absent)}</td>
+    <td>${fmtNum(r.P)}</td><td>${fmtNum(r.FJ)}</td><td>${fmtNum(r.FI)}</td><td>${fmtNum(r.faltas)}</td>
+    <td><span class="status-chip ${r.statusCls}">${r.statusLabel}</span></td>
+  </tr>`).join('');
+  el.innerHTML = rows.length ? `
+    <div class="table-wrap"><div class="table-scroll">
+    <table class="std-table">
+      <thead><tr><th>Unidade</th><th>Mês</th><th>Turno</th><th>% Presença</th><th>% Absent.</th><th>Presenças</th><th>FJ</th><th>FI</th><th>Faltas</th><th>Status</th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table></div></div>
+    <p style="font-size:10.5px;color:var(--tx-secondary);margin-top:8px;font-weight:600">Status: Excelente ≥95% · Atenção 85–94,9% · Crítico &lt;85% (limiares de referência, a confirmar com o cliente).</p>`
+    : noDataBlock('Nenhum grupo Unidade/Turno/Mês corresponde à combinação de filtros ativa.');
+}
+
+/* ============================================================
+   16. HORA EXTRA (#sec-he) — soma ex50+ex100 (ver nota no topo de data_block_full.js)
+   ============================================================ */
+function collectHERows(opts){
+  opts = opts||{};
+  const meses = opts.mes ? [opts.mes] : MESES;
+  const monthNums = meses.map(m=>MES_NUM[m]);
+  const rows = [];
+  DADOS.forEach(grp=>{
+    if(opts.unidade && grp.unidade!==opts.unidade) return;
+    if(opts.turno && grp.turno!==opts.turno) return;
+    grp.colaboradores.forEach(c=>{
+      if(opts.cargo && c.cargo!==opts.cargo) return;
+      Object.keys(c.he||{}).forEach(iso=>{
+        const mnum = +iso.slice(5,7);
+        if(monthNums.indexOf(mnum)===-1) return;
+        if(!isColabActiveForMonth(c, mnum)) return;
+        const ex50 = hhmmToDecimal(c.he[iso].ex50);
+        const ex100 = hhmmToDecimal(c.he[iso].ex100);
+        if(ex50<=0 && ex100<=0) return;
+        rows.push({date:iso, unidade:grp.unidade, turno:grp.turno, cargo:c.cargo, colab:c.nome, ex50, ex100});
+      });
+    });
+  });
+  return rows;
+}
+function renderHE(){
+  const kpiEl = document.getElementById('heKpis');
+  const tabEl = document.getElementById('heTabela');
+  const chEl = document.getElementById('heCharts');
+  const subEl = document.getElementById('heSub');
+  const opts = {unidade:state.unidade, mes:state.mes, turno:state.turno, cargo:state.cargo};
+  const rows = collectHERows(opts);
+  const mesLabel = state.mes ? state.mes+'/2026' : 'período selecionado (Julho–Agosto/2026)';
+  subEl.textContent = `Apurado a partir do registro de hora extra de cada colaborador (adicional 50% e 100%) — ${mesLabel}.`;
+
+  const totalH = rows.reduce((s,r)=>s+r.ex50+r.ex100,0);
+  const colabsComHE = new Set(rows.map(r=>r.colab)).size;
+  const mediaPorColab = colabsComHE>0 ? totalH/colabsComHE : 0;
+  const byUnidadeTot = {};
+  rows.forEach(r=>{ byUnidadeTot[r.unidade]=(byUnidadeTot[r.unidade]||0)+r.ex50+r.ex100; });
+  let maiorUnidade='—', maiorVal=-1;
+  Object.keys(byUnidadeTot).forEach(u=>{ if(byUnidadeTot[u]>maiorVal){ maiorVal=byUnidadeTot[u]; maiorUnidade=u; } });
+
+  kpiEl.innerHTML = `
+    <div class="kpi acc-purple"><div class="kpi-label">Total de Horas Extras</div><div class="kpi-value">${hoursToHHMM(totalH)}h</div><div class="kpi-sub">${esc(mesLabel)}</div></div>
+    <div class="kpi"><div class="kpi-label">Colaboradores com HE</div><div class="kpi-value">${fmtNum(colabsComHE)}</div></div>
+    <div class="kpi acc-indigo"><div class="kpi-label">Média de HE por Colaborador</div><div class="kpi-value">${hoursToHHMM(mediaPorColab)}h</div></div>
+    <div class="kpi acc-amber"><div class="kpi-label">Unidade com Maior Volume</div><div class="kpi-value" style="font-size:16px">${esc(maiorUnidade)}</div><div class="kpi-sub">${hoursToHHMM(Math.max(maiorVal,0))}h</div></div>
+  `;
+
+  const unidsList = Array.from(new Set(rows.map(r=>r.unidade))).sort();
+  const tableRows = unidsList.map(u=>{
+    const rs = rows.filter(r=>r.unidade===u);
+    const h50 = rs.reduce((s,r)=>s+r.ex50,0);
+    const h100 = rs.reduce((s,r)=>s+r.ex100,0);
+    const tot = h50+h100;
+    const nColab = new Set(rs.map(r=>r.colab)).size;
+    const media = nColab>0? tot/nColab:0;
+    return {u, h50, h100, tot, nColab, media};
+  }).sort((a,b)=>b.tot-a.tot);
+  const trs = tableRows.map(r=>`<tr><td>${esc(r.u)}</td><td>${hoursToHHMM(r.h50)}</td><td>${hoursToHHMM(r.h100)}</td><td><strong>${hoursToHHMM(r.tot)}</strong></td><td>${r.nColab}</td><td>${hoursToHHMM(r.media)}</td></tr>`).join('');
+  tabEl.innerHTML = tableRows.length ? `
+    <div class="table-wrap"><div class="table-scroll">
+    <table class="std-table">
+      <thead><tr><th>Unidade</th><th>HE 50% (h)</th><th>HE 100% (h)</th><th>HE Total (h)</th><th>Colaboradores c/ HE</th><th>Média HE/Colaborador (h)</th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table></div></div>` : noDataBlock('Nenhum registro de hora extra encontrado para a combinação de filtros ativa.');
+
+  chEl.innerHTML = `
+    <div class="ch-donut"><h3>Composição HE 50% × 100%</h3><div class="ch-canvas-wrap" style="position:relative"><canvas id="chHEDonut"></canvas><div class="donut-center-label" id="heDonutCenter"></div></div></div>
+    <div class="ch"><h3>Evolução Mensal de HE Total</h3><div class="ch-canvas-wrap"><canvas id="chHEEvol"></canvas></div></div>
+    <div class="ch"><h3>HE por Unidade (50% + 100%)</h3><div class="ch-canvas-wrap"><canvas id="chHEUnidade"></canvas></div></div>
+    <div class="ch"><h3>HE por Turno (50% + 100%)</h3><div class="ch-canvas-wrap"><canvas id="chHETurno"></canvas></div></div>
+    <div class="ch"><h3>HE por Cargo/Setor (50% + 100%)</h3><div class="ch-canvas-wrap"><canvas id="chHECargo"></canvas></div></div>
+  `;
+
+  renderChartSafe('chHEDonut','Composição HE', ()=>{
+    const h50 = rows.reduce((s,r)=>s+r.ex50,0), h100 = rows.reduce((s,r)=>s+r.ex100,0);
+    destroyChart('heDonut');
+    charts.heDonut = new Chart(document.getElementById('chHEDonut'), {
+      type:'doughnut',
+      data:{labels:['HE 50%','HE 100%'], datasets:[{data:[h50,h100], backgroundColor:['#0079C2','#6B21A8'], borderWidth:0}]},
+      options:{responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}}
+    });
+    document.getElementById('heDonutCenter').innerHTML = `<span class="v">${hoursToHHMM(h50+h100)}h</span><span class="l">Total</span>`;
+  });
+  renderChartSafe('chHEEvol','Evolução Mensal HE', ()=>{
+    const meses = MESES;
+    const totals = meses.map(m=>{
+      const rs = collectHERows(Object.assign({}, opts, {mes:m}));
+      return rs.reduce((s,r)=>s+r.ex50+r.ex100,0);
+    });
+    destroyChart('heEvol');
+    charts.heEvol = new Chart(document.getElementById('chHEEvol'), {
+      type:'line',
+      data:{labels:meses, datasets:[{label:'HE Total (h)', data:totals, borderColor:'#B45309', backgroundColor:'rgba(180,83,9,.12)', fill:true, tension:.2, pointRadius:3}]},
+      options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}}, plugins:{legend:{display:false}}}
+    });
+  });
+  function stackedByDim(dimList, dimFn, canvasId, key){
+    renderChartSafe(canvasId, 'HE por dimensão', ()=>{
+      const labels = dimList.filter(d=> rows.some(r=>dimFn(r)===d));
+      const d50 = labels.map(l=> rows.filter(r=>dimFn(r)===l).reduce((s,r)=>s+r.ex50,0));
+      const d100 = labels.map(l=> rows.filter(r=>dimFn(r)===l).reduce((s,r)=>s+r.ex100,0));
+      destroyChart(key);
+      charts[key] = new Chart(document.getElementById(canvasId), {
+        data:{labels, datasets:[
+          {type:'bar', label:'HE 50%', data:d50, backgroundColor:'#0079C2'},
+          {type:'bar', label:'HE 100%', data:d100, backgroundColor:'#6B21A8'},
+        ]},
+        options:{responsive:true, maintainAspectRatio:false,
+          scales:{x:{stacked:true}, y:{stacked:true, beginAtZero:true}},
+          plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}, barValuePlugin:{unit:'h'}}}
+      });
+    });
+  }
+  stackedByDim(Array.from(new Set(rows.map(r=>r.unidade))), r=>r.unidade, 'chHEUnidade', 'heUnidade');
+  stackedByDim(TURNOS, r=>r.turno, 'chHETurno', 'heTurno');
+  stackedByDim(CARGOS, r=>r.cargo, 'chHECargo', 'heCargo');
+}
+
+/* ============================================================
+   17. ORQUESTRAÇÃO GERAL, SCROLL-SPY, MENU MOBILE, INIT
+   ============================================================ */
+function renderAll(){
+  renderDimensionamento();
+  renderOperGrid();
+  renderKPIs();
+  renderGradeRH();
+  renderGraficos();
+  renderEvolucao();
+  renderMovimentacoes();
+  renderResumo();
+  renderHE();
+
+  const raf = (typeof requestAnimationFrame==='function') ? requestAnimationFrame : (fn)=>setTimeout(fn,16);
+  raf(()=>raf(()=>{
+    Object.keys(charts).forEach(key=>{
+      const c = charts[key];
+      if(c && typeof c.resize==='function'){ try{ c.resize(); }catch(e){} }
+    });
+  }));
+}
+
+function closeSidebarMobile(){
+  const sb = document.getElementById('sidebar'), bd = document.getElementById('sbBackdrop');
+  if(sb) sb.classList.remove('open');
+  if(bd) bd.classList.remove('show');
+}
+function setupScrollSpy(){
+  const items = Array.from(document.querySelectorAll('.sb-item'));
+  const sections = items.map(it=>document.querySelector(it.dataset.target)).filter(Boolean);
+  items.forEach(it=>{
+    it.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const target = document.querySelector(it.dataset.target);
+      if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+      closeSidebarMobile();
+    });
+  });
+  function onScroll(){
+    let currentId = null;
+    const threshold = 150;
+    sections.forEach(sec=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top - threshold <= 0) currentId = '#'+sec.id;
+    });
+    items.forEach(it=> it.classList.toggle('active', it.dataset.target===currentId));
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+}
+function setupHamburger(){
+  const btn = document.getElementById('hamburgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sbBackdrop');
+  if(!btn) return;
+  btn.addEventListener('click', ()=>{
+    sidebar.classList.toggle('open');
+    backdrop.classList.toggle('show');
+  });
+  backdrop.addEventListener('click', closeSidebarMobile);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  preprocess();
+  initFilters();
+  renderAll();
+  setupScrollSpy();
+  setupHamburger();
+});
+</script>
+</body>
+</html>
