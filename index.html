@@ -1811,13 +1811,7 @@ function renderDimUnitCard(cd, dimCargoData, effectiveVals){
           <span class="dim-setor-delta">${delta>=0? '+'+delta : delta} colab.</span>
         </div>
         ${renderDimBarPair(v.solicitado, v.contratado)}
-        <div class="dim-cargo-list">
-          <div class="dim-cargo-row">
-            <div class="dim-cargo-name" style="color:${cargoColor(d.cargo)}">${esc(d.cargo)}</div>
-            ${renderDimBarPair(v.solicitado, v.contratado)}
-            <div class="dim-turno-chips">${turnoChips || '<span class="dim-turno-chip">Sem quebra por turno</span>'}</div>
-          </div>
-        </div>
+        <div class="dim-turno-chips">${turnoChips || '<span class="dim-turno-chip">Sem quebra por turno</span>'}</div>
       </div>`;
   }).join('');
   return `
