@@ -8,7 +8,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
+/* ============================================================
+   ESTADO DE CARREGAMENTO / ERRO (backend vivo)
+   ============================================================ */
+#liveLoading{position:fixed; inset:0; z-index:2000; background:rgba(240,242,245,.97); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;}
+#liveLoading .spinner{width:34px; height:34px; border-radius:50%; border:3px solid #DDE2EA; border-top-color:#0079C2; animation:liveSpin .8s linear infinite;}
+@keyframes liveSpin{to{transform:rotate(360deg);}}
+#liveLoading .msg{font-size:13px; font-weight:600; color:#4B5768;}
+#liveError{position:fixed; top:0; left:0; right:0; z-index:1900; background:#FEE2E0; border-bottom:1px solid #F3D3D0; color:#C0281C; padding:10px 26px; font-size:12.5px; font-weight:600; display:none; align-items:center; justify-content:space-between; gap:12px;}
+#liveError.show{display:flex;}
+#liveError button{background:#fff; border:1px solid #F3D3D0; color:#C0281C; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:6px; cursor:pointer;}
+#liveBadge{font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; margin-left:8px; vertical-align:middle;}
+#liveBadge.ok{background:#E8F5EE; color:#0E7A43;}
+#liveBadge.stale{background:#FEF3C7; color:#B45309;}
+</style>
+<style>
+/* ===== CSS ORIGINAL DA BARRY CALLEBAUT (fallback para classes proprias) ===== */
+
 /* ============================================================
    RESET & VARIÁVEIS
    ============================================================ */
@@ -49,6 +67,8 @@ button{font-family:var(--font); cursor:pointer;}
 }
 .sb-brand{padding:18px 18px 10px; font-size:15px; font-weight:800; color:#fff; letter-spacing:.3px; line-height:1.3;}
 .sb-brand small{display:block; font-size:10px; font-weight:600; color:var(--sb-text); letter-spacing:.6px; text-transform:uppercase; margin-top:3px;}
+.sb-logo{padding:18px 18px 14px; display:flex; align-items:center; justify-content:center;}
+.sb-logo img{height:44px; width:auto; max-width:100%; background:#fff; border-radius:6px; padding:6px 14px; object-fit:contain; flex-shrink:0;}
 .sb-nav{flex:1; padding:6px 0 24px;}
 .sb-sec{padding:16px 18px 6px; font-size:9px; color:var(--sb-text); text-transform:uppercase; letter-spacing:1.2px; font-weight:700;}
 .sb-item{
@@ -202,14 +222,15 @@ table.tgrade-uni tbody tr.grp-header td.stcol{box-shadow:2px 0 0 var(--indigo);}
 table.tgrade-uni tbody tr.tr-res-label td.stcol{text-align:right; font-weight:700; font-size:10.5px; padding:6px 10px !important;}
 table.tgrade-uni tbody tr.tr-res-label td.stcol .stc-flex{justify-content:flex-end; text-align:right;}
 table.tgrade-uni tbody tr.tr-res-label td{background:#FAFBFD;}
-table.tgrade-uni tbody tr.tr-res-label.r-fer td.stcol{color:#6B21A8;}
-table.tgrade-uni tbody tr.tr-res-label.r-ferias td.stcol{color:#0079C2;}
-table.tgrade-uni tbody tr.tr-res-label.r-flg td.stcol{color:#64748B;}
-table.tgrade-uni tbody tr.tr-res-label.r-des td.stcol{color:#334155;}
-table.tgrade-uni tbody tr.tr-res-label.r-fi td.stcol{color:#C0281C;}
-table.tgrade-uni tbody tr.tr-res-label.r-fj td.stcol{color:#B45309;}
-table.tgrade-uni tbody tr.tr-res-label.r-p td.stcol{color:#0E7A43;}
-table.tgrade-uni tbody tr.tr-res-label.r-pct td.stcol{color:#0F1B2D; font-weight:800;}
+table.tgrade-uni tbody tr.tr-res-label.r-fer td.stcol{color:#9900FF;}
+table.tgrade-uni tbody tr.tr-res-label.r-ferias td.stcol{color:#548235;}
+table.tgrade-uni tbody tr.tr-res-label.r-flg td.stcol{color:#000;}
+table.tgrade-uni tbody tr.tr-res-label.r-des td.stcol{color:#F1C232;}
+table.tgrade-uni tbody tr.tr-res-label.r-fi td.stcol{color:#ED0000;}
+table.tgrade-uni tbody tr.tr-res-label.r-fj td.stcol{color:#ED7D31;}
+table.tgrade-uni tbody tr.tr-res-label.r-p td.stcol{color:#1A56DB;}
+table.tgrade-uni tbody tr.tr-res-label.r-pct td.stcol{background:var(--indigo) !important; color:#fff !important; font-weight:800;}
+table.tgrade-uni tbody tr.tr-res-label.r-pct td:not(.stcol):not(.gt-tot){color:var(--indigo); font-weight:800;}
 table.tgrade-uni tbody tr.tr-res-label td:not(.stcol){font-weight:700; color:var(--tx-secondary); font-size:10.5px;}
 
 table.tgrade-uni tbody tr.tr-total td.stcol{font-weight:800; text-align:right; color:#fff; background:var(--blue-dark) !important;}
@@ -227,22 +248,38 @@ th.col-weekend-head{background:#16283F !important;}
 th.folga-geral{color:#ED0000 !important;}
 
 .st-empty{color:#C7CFDA;}
-.mc-p{color:#0E7A43; font-weight:800;}
-.mc-fj{color:#B45309; font-weight:800;}
-.mc-fi{color:#C0281C; font-weight:800;}
-.mc-folga{color:#64748B; font-weight:800;}
-.mc-fer{color:#6B21A8; font-weight:800;}
-.mc-ferias{color:#0079C2; font-weight:800;}
-.mc-d{color:#334155; font-weight:800;}
-.mc-at{color:#C0281C; font-weight:800;}
-.mc-int{color:#2D5099; font-weight:800;}
+/* ===== cores das celulas diarias — alinhadas ao modelo GPA (formatacao condicional da planilha origem) ===== */
+.mc-p{color:#4285F4; font-weight:800;}
+.mc-fj{color:#ED7D31; font-weight:800;}
+.mc-fi{color:#ED0000; font-weight:800;}
+.mc-folga{color:#000; font-weight:800;}
+.mc-fer{color:#9900FF; font-weight:800;}
+.mc-ferias{color:#548235; font-weight:800;}
+.mc-d{color:#F1C232; font-weight:800;}
+.mc-at{color:#ED0000; font-weight:800;}
+.mc-int{color:#065F46; font-weight:800;}
 .he-mark{position:relative;}
 .he-mark::after{content:''; position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:50%; background:#9900FF;}
 
-.tot-p{background:#E8F5EE !important; color:#0E7A43;}
-.tot-fj{background:#FEF3C7 !important; color:#B45309;}
-.tot-fi{background:#FEE2E0 !important; color:#C0281C;}
-.tot-flg{background:#EEF1F6 !important; color:#334155;}
+/* ===== colunas de totais mensais (fim da Grade Diaria) — sistema gt-tot/gtc-*/gtv-* identico ao modelo GPA ===== */
+table.tgrade-uni td.gt-tot{background:#EEF2F7 !important; font-weight:800; color:var(--indigo); border-left:2px solid var(--indigo);}
+table.tgrade-uni thead th.gt-tot{background:var(--indigo) !important; color:#fff !important; font-weight:800; border-left:2px solid rgba(255,255,255,.3);}
+table.tgrade-uni thead th.gt-tot.gtc-p{background:#1A56DB !important;}
+table.tgrade-uni thead th.gt-tot.gtc-fj{background:#ED7D31 !important;}
+table.tgrade-uni thead th.gt-tot.gtc-fi{background:#ED0000 !important;}
+table.tgrade-uni thead th.gt-tot.gtc-flg{background:#000 !important;}
+table.tgrade-uni thead th.gt-tot.gtc-he5{background:#9900FF !important;}
+table.tgrade-uni thead th.gt-tot.gtc-he1{background:#C0281C !important;}
+table.tgrade-uni tbody tr:hover td.gt-tot{background:#DCE7F7 !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-p{background:#fff !important; color:#1A56DB !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-fj{background:#fff !important; color:#ED7D31 !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-fi{background:#fff !important; color:#ED0000 !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-flg{background:#fff !important; color:#000 !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-he5{background:#fff !important; color:#9900FF !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-he1{background:#fff !important; color:#C0281C !important;}
+table.tgrade-uni tbody tr td.gt-tot.gtv-het{background:#fff !important; color:var(--indigo) !important;}
+table.tgrade-uni tbody tr.tr-res-label td.gt-tot{background:#FAFBFD !important; color:var(--tx-secondary);}
+table.tgrade-uni tbody tr.grp-header td.gt-tot{background:var(--indigo) !important;}
 table.tgrade-uni thead th.tot-head{white-space:normal; line-height:1.25; font-size:9px;}
 
 .grade-legend{display:flex; flex-wrap:wrap; gap:14px; padding:10px 4px; font-size:11px; color:var(--tx-secondary); font-weight:600;}
@@ -347,31 +384,741 @@ button, a.sb-item, select{min-height:36px;}
   .arrow-btn{min-width:44px; min-height:44px;}
   .hamburger-btn{min-width:44px; min-height:44px;}
 }
+
+/* ===== SISTEMA VISUAL PADRAO (copiado do modelo GPA/Fastlog) ===== */
+
+
+:root{
+  --sidebar-w:260px; --sidebar-w-col:60px; --topbar-h:56px;
+  --bg:#F0F2F5; --card:#FFF; --border:#DDE2EA; --border-light:#EAECF0;
+  --blue:#0079C2; --blue-dark:#005A9E; --blue-light:#E6F2FA;
+  --indigo:#1E3A6E; --indigo-mid:#2D5099;
+  --sb-bg:#0F1B2D; --sb-hover:#1A2D46; --sb-active:#0079C2;
+  --sb-text:#8FA8C4; --sb-text-act:#FFF;
+  --green:#0E7A43; --green-bg:#E8F5EE;
+  --amber:#B45309; --amber-bg:#FEF3C7;
+  --red:#C0281C; --red-bg:#FEE2E0;
+  --purple:#6B21A8;
+  --tx-primary:#0F1B2D; --tx-secondary:#4B5768; --tx-muted:#5C6B7E; --tx-white:#FFF;
+  --font:"Inter",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--tx-primary);font-size:14px;display:flex;min-height:100vh;overflow-x:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--sb-bg);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;
+  transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.sidebar.col{width:var(--sidebar-w-col);min-width:var(--sidebar-w-col)}
+
+
+
+.sidebar.col .sb-logo-txt{opacity:0;pointer-events:none}
+.sb-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0}
+.sb-sec{font-size:9px;font-weight:700;color:var(--sb-text);text-transform:uppercase;
+  letter-spacing:1.2px;padding:14px 20px 6px;white-space:nowrap;overflow:hidden;
+  opacity:1;transition:opacity .2s}
+.sidebar.col .sb-sec{opacity:0}
+.sb-item{display:flex;align-items:center;gap:11px;padding:9px 18px;cursor:pointer;
+  color:var(--sb-text);font-size:13px;font-weight:500;transition:all .15s;
+  border-left:3px solid transparent;white-space:nowrap;text-decoration:none;
+  user-select:none}
+.sb-item:hover{background:var(--sb-hover);color:var(--sb-text-act)}
+.sb-item.active{background:rgba(0,121,194,.18);color:var(--sb-text-act);border-left-color:var(--sb-active)}
+.sb-item svg{width:17px;height:17px;flex-shrink:0;opacity:.7;transition:opacity .15s}
+.sb-item.active svg,.sb-item:hover svg{opacity:1}
+.sb-item-txt{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;flex:1;opacity:1;transition:opacity .2s}
+.sidebar.col .sb-item-txt{opacity:0;pointer-events:none}
+
+
+
+.sidebar.col .sb-toggle svg{transform:rotate(180deg)}
+
+.sidebar.col .sb-toggle-txt{opacity:0;pointer-events:none}
+
+/* ── MAIN ── */
+
+
+
+/* ── CABEÇALHO FIXO (topbar + barra de filtros) ──
+   Os dois ficam dentro de um único wrapper "sticky" (em vez de cada um
+   sticky separadamente) para que, ao rolar qualquer seção do dashboard OU
+   navegar pela sidebar (que também rola a página até a seção), tanto o
+   título quanto os FILTROS selecionados (Unidade/Mês/Turno/Setor/Cargo)
+   continuem visíveis no topo — o usuário sempre vê quais filtros estão
+   ativos e os dados filtrados correspondentes, sem precisar rolar de volta.
+   Um wrapper único também evita ter que calcular a altura exata do topbar
+   (que varia no mobile, onde vira height:auto) para posicionar a barra de
+   filtros logo abaixo dele. */
+.sticky-header{position:sticky;top:0;z-index:50;background:var(--card);flex-shrink:0}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--topbar-h);background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+  gap:16px}
+
+
+
+/* ── FILTROS ── */
+.filter-bar{background:var(--card);border-bottom:1px solid var(--border);
+  padding:10px 24px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;
+  box-shadow:0 1px 4px rgba(15,27,45,.04)}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:10px;font-weight:700;color:var(--tx-secondary);text-transform:uppercase;letter-spacing:.5px}
+.fg select{border:1.5px solid var(--border);border-radius:6px;padding:7px 30px 7px 11px;
+  font-size:13px;font-weight:500;color:var(--tx-primary);background:var(--bg);cursor:pointer;
+  font-family:var(--font);min-width:140px;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%234B5768' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;transition:border .15s}
+.fg select:focus{outline:none;border-color:var(--blue);background-color:#fff}
+.fg input[type=text]{border:1.5px solid var(--border);border-radius:6px;padding:7px 11px;
+  font-size:13px;font-weight:500;color:var(--tx-primary);background:var(--bg);
+  font-family:var(--font);min-width:220px;transition:border .15s}
+.fg input[type=text]:focus{outline:none;border-color:var(--blue);background-color:#fff}
+.btn-clear{border:1.5px solid var(--border);border-radius:6px;padding:7px 14px;
+  font-size:13px;font-weight:600;cursor:pointer;color:var(--tx-secondary);background:#fff;
+  font-family:var(--font);align-self:flex-end;transition:all .15s;white-space:nowrap}
+.btn-clear:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
+
+
+/* ── CONTEÚDO ── */
+.content{padding:20px 24px;flex:1}
+
+/* ── SEÇÃO ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin:22px 0 13px;scroll-margin-top:130px}
+.sec-head:first-child{margin-top:0}
+.sec-title{font-size:11.5px;font-weight:800;color:var(--tx-secondary);
+  text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.sec-line{flex:1;height:1px;background:var(--border-light)}
+
+/* ── DIMENSIONAMENTO ── */
+:root{
+  --dim-sol:#1E3A6E;       /* azul escuro = solicitado */
+  --dim-rel:#0079C2;       /* azul médio = realizado   */
+  --dim-gap-neg:#C0281C;   /* vermelho = gap negativo  */
+  --dim-gap-pos:#0E7A43;   /* verde    = gap positivo  */
+  --dim-warn:#B45309;      /* âmbar    = atenção       */
+}
+/* ---- Cards de KPI do dimensionamento ---- */
+
+
+
+
+/* ---- Bloco de comparativo visual por unidade ---- */
+
+
+
+
+
+
+
+
+.dim-card-gap-badge{font-size:12.5px;font-weight:800;padding:5px 13px;border-radius:20px;white-space:nowrap}
+.dim-gap-ok{background:#d1fae5;color:#065f46}
+.dim-gap-warn{background:#fef3c7;color:#92400e}
+.dim-gap-crit{background:#fee2e2;color:#991b1b}
+.dim-gap-exc{background:#dbeafe;color:#1e40af}
+
+
+
+
+
+
+.dim-bar-item{display:flex;align-items:center;gap:7px}
+
+.dim-bar-track{flex:1;height:8px;border-radius:4px;background:#EEF2F7;overflow:hidden;position:relative}
+.dim-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.dim-bar-val{font-size:11px;font-weight:800;min-width:26px;text-align:right}
+
+.dim-bar-fill.sol{background:var(--dim-sol)}
+.dim-bar-fill.rel{background:var(--dim-rel)}
+.dim-bar-val.sol{color:var(--dim-sol)}
+.dim-bar-val.rel{color:var(--dim-rel)}
+
+.dim-pct-chip{font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px}
+.dim-pct-ok{background:#d1fae5;color:#065f46}
+.dim-pct-warn{background:#fef3c7;color:#92400e}
+.dim-pct-crit{background:#fee2e2;color:#991b1b}
+.dim-pct-exc{background:#dbeafe;color:#1e40af}
+
+/* ---- Grids de KPI próprios (evita conflito de especificidade com .kpi-grid
+   em telas pequenas — cada seção define e sobrescreve suas próprias colunas) ---- */
+
+
+
+
+
+
+
+/* ---- Resultado Operacional: cards ampliados com média/meta em destaque ---- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---- Controle de Produtividade: tabela diária por turno ---- */
+
+
+
+
+
+/* ---- Produtividade Individual: tabela detalhada por colaborador, dia a
+   dia (cópia fiel da aba "Produção" de cada planilha). 1ª coluna (Nome)
+   fixa via position:sticky para não se perder durante o scroll horizontal
+   pelos 31 dias do mês. ---- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---- Tabela resumo por cargo ---- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---- Legenda comparativa ---- */
+
+
+
+
+/* ── PRESENÇA DIÁRIA ── */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Tabela desligamentos */
+
+
+
+
+
+
+
+
+
+
+
+
+/* Filtros presença */
+
+
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin-bottom:4px}
+.kpi{background:var(--card);border-radius:8px;padding:15px 16px;
+  border:1px solid var(--border-light);border-left:4px solid var(--blue);
+  box-shadow:0 1px 3px rgba(15,27,45,.06);transition:box-shadow .2s,transform .15s;cursor:default}
+.kpi:hover{box-shadow:0 4px 14px rgba(15,27,45,.12);transform:translateY(-1px)}
+.kpi.k-green{border-left-color:var(--green)}
+.kpi.k-amber{border-left-color:var(--amber)}
+.kpi.k-red{border-left-color:var(--red)}
+.kpi.k-purple{border-left-color:var(--purple)}
+.kpi.k-indigo{border-left-color:var(--indigo)}
+
+
+.kpi.k-green .kpi-val{color:var(--green)}
+.kpi.k-amber .kpi-val{color:var(--amber)}
+.kpi.k-red .kpi-val{color:var(--red)}
+.kpi.k-purple .kpi-val{color:var(--purple)}
+.kpi.k-indigo .kpi-val{color:var(--indigo)}
+.kpi-sub{font-size:11px;color:var(--tx-muted)}
+
+/* ── CHART GRID ── */
+
+
+
+
+
+
+.ch{position:relative;height:240px}
+
+.ch-hbar{height:260px;transition:height .15s ease}
+
+
+/* ── TABS DE EVOLUÇÃO ── */
+
+
+.evo-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.evo-tab:hover:not(.active){color:var(--tx-secondary)}
+
+.evo-pane.active{display:block}
+
+/* ── TABELAS DE EVOLUÇÃO ── */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ── GRADE DIÁRIA ── */
+.tbl-card{background:var(--card);border-radius:8px;border:1px solid var(--border-light);
+  box-shadow:0 1px 3px rgba(15,27,45,.06);overflow:hidden;margin-bottom:13px}
+.tbl-head{padding:13px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tbl-head h3{font-size:13px;font-weight:700;color:var(--tx-primary)}
+.tbl-head span{font-size:11px;color:var(--tx-muted)}
+.tbl-head span b{font-weight:800;letter-spacing:.4px}
+/* Legenda da 1ª linha (dentro do tbl-head) reaproveita .gl-item/.gl-item b
+   da legenda da 2ª linha (.grade-legend), garantindo a mesma tipografia nas
+   duas linhas — só sem o padding/fundo/borda, que aqui não se aplicam
+   porque essa legenda vive dentro do cabeçalho do card, não numa faixa
+   própria. */
+
+/* Especificidade extra para vencer ".tbl-head span"/".tbl-head span b" (que
+   também bateriam nesses elementos, por serem spans/b dentro de .tbl-head)
+   e garantir que a 1ª linha use exatamente a mesma tipografia da 2ª. */
+
+
+.grade-legend{display:flex;gap:10px;flex-wrap:wrap;padding:9px 16px;
+  background:#F8FAFC;border-bottom:1px solid var(--border-light)}
+
+
+
+.tbl-scroll{overflow:auto;max-height:460px;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+
+
+
+
+
+/* Grade em DUAS tabelas sincronizadas (painel congelado + painel rolável),
+   reproduzindo de verdade o "congelar painéis" do Excel — em vez da
+   abordagem anterior (uma única tabela com position:sticky por célula nas
+   4 primeiras colunas). O sticky por célula, combinado com table-layout:fixed
+   em até 31 colunas de dia, se mostrou frágil: bastava a largura real
+   renderizada divergir minimamente da largura assumida pelos offsets left:
+   fixos (min-width:100% forçando redistribuição, zoom do navegador,
+   diferenças de motor de renderização) para reabrir o vão em branco ao lado
+   de "Unidade" — o mesmo bug reportado repetidas vezes apesar de cada
+   correção isolada de largura estar matematicamente certa.
+   Com duas tabelas, o painel congelado (Colaborador/Unidade/Setor/Turno)
+   é uma tabela própria de exatamente 4 colunas que NUNCA rola
+   horizontalmente — não existe mais nenhum offset left: fixo para
+   dessincronizar. A rolagem vertical das duas tabelas é sincronizada via
+   JS (initGradeScrollSync: o painel congelado tem overflow:hidden e seu
+   scrollTop é espelhado a partir do scroll do painel rolável a cada evento
+   "scroll"). O cabeçalho de cada tabela usa position:sticky;top:0 sozinho
+   (um único eixo, sem left — suportado de forma consistente em qualquer
+   navegador, diferente da combinação sticky-top + sticky-left que causava
+   o bug). */
+
+
+.tgrade{border-collapse:separate;border-spacing:0;font-size:11.5px;table-layout:fixed}
+/* Altura idêntica nas DUAS tabelas: cada uma tem seu próprio <thead>
+   independente, então qualquer diferença de conteúdo entre eles (uma
+   célula quebrando linha, por exemplo) desalinha o corpo inteiro da
+   tabela rolável em relação ao painel congelado.
+   IMPORTANTE: em células de tabela (th/td), a propriedade height é um
+   MÍNIMO, não um teto — mesmo com overflow:hidden, a linha ainda cresce
+   para caber o conteúdo mais alto. Isso é exatamente o que desalinhava as
+   duas tabelas depois que os cabeçalhos de total passaram a quebrar em
+   várias linhas: só o <thead> do painel rolável (que tem essas colunas)
+   ficava mais alto, o do painel congelado (que não tem) continuava com 1
+   linha só — as duas tabelas cresciam para alturas diferentes.
+   Correção: TODO texto de th (nas duas tabelas) fica dentro de um
+   .th-wrap com altura FIXA (elemento comum, não célula de tabela — nele
+   height realmente é um teto), então as duas tabelas ficam com a mesma
+   altura de cabeçalho não importa se o texto quebra ou não. */
+.tgrade th{background:var(--indigo);color:#fff;text-align:center;font-weight:700;
+  font-size:10px;text-transform:uppercase;letter-spacing:.5px;vertical-align:middle;
+  position:sticky;top:0;z-index:3;height:40px;box-sizing:border-box;overflow:hidden;padding:0}
+.tgrade th .th-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:40px;
+  box-sizing:border-box;overflow:hidden;padding:7px 8px;line-height:14px;white-space:nowrap;text-align:center}
+
+.tgrade td{padding:5px 7px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--border-light);
+  border-right:1px solid var(--border-light);white-space:nowrap;font-size:11.5px;line-height:15px}
+
+/* Larguras/alinhamento valem para th E td — mas a COR é definida só para td
+   logo abaixo. Antes as duas regras vinham juntas e a cor (indigo/muted/blue)
+   também caía no th, sobrescrevendo o branco do cabeçalho e apagando o texto
+   (ex.: "UNIDADE" ficava invisível, indigo sobre indigo). */
+
+
+
+
+
+
+
+
+
+
+.tgrade tr:nth-child(even){background:#F8FAFC}
+
+.tgrade tr:hover td{background:#EEF5FF!important}
+.tgrade tr.tgroup-header td{background:var(--indigo)!important;color:#fff!important;font-weight:800;
+  text-align:left;padding:6px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Cores conforme formatação condicional da planilha "Controle de Presença Diária" — fonte colorida, preenchimento branco (igual à planilha original) */
+.mc-p{color:#4285F4}
+.mc-fj{color:#ED7D31}
+.mc-fi{color:#ED0000}
+
+.mc-fer{color:#9900FF;font-size:9px}
+.mc-d{color:#F1C232;font-size:9px}
+.mc-int{color:#065F46;font-size:9px}
+.mc-ferias{color:#548235;font-size:9px}
+
+
+.tr-res td.r-p{color:#1A56DB!important}
+.tr-res td.r-fj{color:#ED7D31!important}
+.tr-res td.r-fi{color:#ED0000!important}
+.tr-res td.r-flg{color:#000!important}
+.tr-res td.r-fer{color:#9900FF!important}
+
+.tr-res td.r-ferias{color:#548235!important}
+
+
+/* ── Colunas de totais mensais por colaborador (fim da Grade Diária) ── */
+.tgrade td.gt-tot{background:#EEF2F7;font-weight:800;
+  border-left:2px solid var(--indigo);color:var(--indigo)}
+/* Redesenho dos cabeçalhos de total: em vez de espremer a frase inteira
+   ("Total de Faltas Injustificadas no Mês") em letra microscópica quebrada
+   em 3-4 linhas — o que ficava ilegível — cada cabeçalho agora é um rótulo
+   CURTO em 2 níveis: um label principal (gtw-main, negrito, tamanho normal
+   de leitura) + uma legenda pequena "no mês" (gtw-sub, versalete) que dá o
+   contexto sem repetir "Total de..." por extenso. A frase completa continua
+   disponível no atributo title (tooltip ao passar o mouse). Isso permitiu
+   reduzir a altura do cabeçalho de volta a 38px (era 44px) e a largura da
+   coluna para 100px (era 112px) — mais compacto E mais legível ao mesmo
+   tempo, porque o texto visível é curto o bastante para não precisar de
+   fonte minúscula nem de 3+ linhas. */
+.tgrade th.gt-tot{background:var(--indigo);color:#fff!important;font-weight:800;
+  border-left:2px solid rgba(255,255,255,.3)}
+.tgrade th.gt-tot .th-wrap{flex-direction:column;gap:2px;padding:4px 4px;white-space:normal}
+.tgrade th.gt-tot .gtw-main{font-size:11px;font-weight:800;letter-spacing:0;
+  text-transform:none;line-height:12px}
+.tgrade th.gt-tot .gtw-sub{font-size:8px;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;line-height:9px;opacity:.72}
+/* Cada cabeçalho de total ganha o fundo sólido da própria categoria —
+   confirmado pixel a pixel inspecionando o dashboard Bimbo ao vivo
+   (getComputedStyle): gtc-p=#1A56DB, gtc-fj=#ED7D31, gtc-fi=#ED0000,
+   gtc-flg=#000, texto branco em todos. Colunas de Hora Extra (novas) usam
+   roxo (mesma cor do indicador "Hora Extra" já usado na grade — bolinha
+   .mc-ot / mc-fer) para HE 50%, vermelho (mesma cor de destaque de HE 100%
+   já usado na tabela de Detalhamento) para HE 100%, e indigo (cor padrão
+   de "total geral" do dashboard) para Horas Extras Totais. */
+.tgrade th.gt-tot.gtc-p{background:#1A56DB!important}
+.tgrade th.gt-tot.gtc-fj{background:#ED7D31!important}
+.tgrade th.gt-tot.gtc-fi{background:#ED0000!important}
+.tgrade th.gt-tot.gtc-flg{background:#000!important}
+.tgrade th.gt-tot.gtc-he5{background:#9900FF!important}
+.tgrade th.gt-tot.gtc-he1{background:#C0281C!important}
+.tgrade tr:nth-child(even) td.gt-tot{background:#E4EAF3}
+.tgrade tr:hover td.gt-tot{background:#DCE7F7!important}
+.tgrade td.gt-tot.gt-res{color:#fff!important;background:var(--indigo)!important}
+.tgrade tr.tgroup-header td.gt-tot{text-align:center}
+/* Células que trazem as somas (por colaborador e por turno): preenchimento
+   branco + cor da fonte igual à cor do total correspondente — mesma
+   congruência de dado/cor do cabeçalho, porém com fundo branco */
+.tgrade tr td.gt-tot.gtv-p{background:#fff!important;color:#1A56DB!important}
+.tgrade tr td.gt-tot.gtv-fj{background:#fff!important;color:#ED7D31!important}
+.tgrade tr td.gt-tot.gtv-fi{background:#fff!important;color:#ED0000!important}
+.tgrade tr td.gt-tot.gtv-flg{background:#fff!important;color:#000!important}
+.tgrade tr td.gt-tot.gtv-he5{background:#fff!important;color:#9900FF!important}
+.tgrade tr td.gt-tot.gtv-he1{background:#fff!important;color:#C0281C!important}
+.tgrade tr td.gt-tot.gtv-het{background:#fff!important;color:var(--indigo)!important}
+
+/* ── Formatação condicional: colunas de fim de semana (sáb/dom) ── */
+.tgrade th.th-weekend{background:#64748B}
+.tgrade td.td-weekend{background:#F1F5F9!important}
+.tgrade tr:nth-child(even) td.td-weekend{background:#E9EEF3!important}
+.tgrade tr:hover td.td-weekend{background:#E2E9F0!important}
+
+
+
+
+/* Folga geral tem prioridade visual sobre o cinza de fim de semana */
+.tgrade th.oa-vermelho{background:#ED0000!important}
+/* Indicador de hora extra: comentário (title) na célula de presença do colaborador */
+.tgrade td.mc-ot{position:relative;cursor:help}
+.tgrade td.mc-ot::after{content:"";position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:#9900FF}
+
+/* ── TABELA RESUMO ── */
+
+
+
+
+
+
+
+
+
+
+/* ── PILLS ── */
+
+
+
+
+/* Status texto simples (sem pill) */
+
+
+
+
+/* ── FORMATAÇÃO CONDICIONAL (Controle de Produtividade) ── */
+
+
+
+
+
+/* ── FOOTER ── */
+footer{background:var(--card);border-top:1px solid var(--border);
+  padding:13px 24px;display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--tx-muted);gap:10px;flex-wrap:wrap;flex-shrink:0}
+footer strong{color:var(--tx-secondary)}
+
+@media(max-width:1300px){.kpi-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){.kpi-grid,.g2{grid-template-columns:1fr 1fr}
+  .sidebar{width:var(--sidebar-w-col);min-width:var(--sidebar-w-col)}}
+@media(max-width:600px){.kpi-grid,.g2{grid-template-columns:1fr}}
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVO · notebooks, PCs, tablets, celulares (iOS/Android) e TVs
+   ═══════════════════════════════════════════════════════════════ */
+html{-webkit-text-size-adjust:100%}
+img,svg{max-width:100%}
+.topbar,.filter-bar,.pres-filtros,.dim-legend{flex-wrap:wrap}
+
+/* Botão hambúrguer (só aparece em telas de celular) e backdrop do menu */
+
+
+
+.sb-backdrop.show{display:block;opacity:1}
+
+/* ── Notebooks pequenos / tablets em modo paisagem (≤1024px): sidebar em modo ícone ── */
+@media(max-width:1024px){
+  .sidebar{width:var(--sidebar-w-col);min-width:var(--sidebar-w-col)}
+
+  .sb-logo-txt,.sb-sec,.sb-item-txt,.sb-toggle-txt{opacity:0;pointer-events:none}
+
+}
+
+/* ── Tablets em modo retrato (≤768px) ── */
+@media(max-width:768px){
+  .content{padding:16px 14px}
+  .topbar{padding:0 14px;height:auto;min-height:var(--topbar-h);gap:10px}
+  .filter-bar,.pres-filtros,.dim-legend{padding:9px 14px}
+  .kpi-grid,.g2{grid-template-columns:repeat(2,1fr)}
+
+
+  .sec-title{font-size:11px}
+
+
+
+
+}
+
+/* ── Celulares (≤640px): sidebar vira gaveta (drawer) off-canvas, some 100% quando fechada ── */
+@media(max-width:640px){
+
+
+  .sidebar{
+    width:min(280px,80vw)!important;
+    min-width:0!important;
+    transform:translateX(-100%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    z-index:200;
+    box-shadow:4px 0 24px rgba(0,0,0,.28);
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .sidebar.mobile-open{transform:translateX(0)}
+  .sidebar .sb-logo-txt,.sidebar .sb-sec,.sidebar .sb-item-txt,.sidebar .sb-toggle-txt{
+    opacity:1!important;pointer-events:auto!important;
+  }
+
+  .topbar{padding:0 14px;padding-top:env(safe-area-inset-top);height:auto;min-height:var(--topbar-h);gap:10px}
+  .filter-bar,.pres-filtros,.dim-legend{padding:9px 14px}
+  .kpi-grid,.g2{grid-template-columns:1fr}
+
+
+  .ch{height:210px}
+
+  .kpi{padding:12px 13px}
+
+
+
+  .content{padding:14px 12px}
+  footer{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));
+    font-size:10px;text-align:center;justify-content:center}
+
+
+
+
+  /* Grade de marcações: painel congelado mais estreito para sobrar mais
+     espaço de tela às colunas de dias (mesma lógica de freeze panes, só que
+     compacta). Só a largura das colunas muda — não há mais nenhum offset
+     left: fixo para recalcular, já que o painel congelado é uma tabela
+     própria (ver comentário em .grade-pane-frozen). */
+
+
+  #grade-table-frozen colgroup col:nth-child(1){width:96px}
+  #grade-table-frozen colgroup col:nth-child(2){width:78px}
+  #grade-table-frozen colgroup col:nth-child(3){width:62px}
+  #grade-table-frozen colgroup col:nth-child(4){width:50px}
+
+
+
+
+  .tgrade{font-size:10.5px}
+}
+
+/* ── Celulares pequenos (≤420px) ── */
+@media(max-width:420px){
+  .content{padding:12px 10px}
+  .fg select{min-width:0;width:100%;font-size:12px}
+  .fg{flex:1 1 100%}
+
+
+
+
+
+
+
+
+
+}
+
+/* ── Desktops grandes / TVs (≥1921px) ── */
+@media(min-width:1921px){
+  body{font-size:15px}
+  .content{max-width:2200px;margin:0 auto;padding:28px 32px}
+
+
+
+  .ch{height:300px}
+
+  .ch-donut{height:280px}
+  .ch-hbar{min-height:300px}
+  .donut-center-lbl .v{font-size:26px}
+  .donut-center-lbl .l{font-size:11px}
+
+
+
+}
+
+/* ── TVs ultra-wide / 4K (≥2561px) ── */
+@media(min-width:2561px){
+  body{font-size:17px}
+  .content{max-width:2600px}
+
+  .ch{height:360px}
+
+  .ch-donut{height:320px}
+  .ch-hbar{min-height:340px}
+  .donut-center-lbl .v{font-size:30px}
+  .donut-center-lbl .l{font-size:12px}
+
+
+
+}
+
+/* ── Extensões GPA: status extras não presentes no Bimbo (AF, Suspensão, Transferência) ── */
+
+
+
+
+
+
+
+
+
+.gl-item b.mc-af,.gl-item b.mc-susp,.gl-item b.mc-transf,.gl-item b.mc-int{font-size:10.5px;text-transform:none}
+
+/* ── Gráficos de rosca (doughnut) — Absenteísmo e Produção, cores Bimbo ── */
+.ch-donut{position:relative;height:240px;display:flex;align-items:center;justify-content:center}
+
+
+
+
+.donut-center-lbl .v{font-size:20px;font-weight:900;color:var(--tx-primary);display:block;line-height:1.1}
+.donut-center-lbl .l{font-size:9px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.4px}
+
+
+/* ===== itens de sidebar "em breve" (sem dado disponivel na Barry ainda) ===== */
+.sb-item-stub{opacity:.55}
+.sb-item-stub:hover{opacity:.85}
+
 </style>
 </head>
 <body>
+<div id="liveLoading"><div class="spinner"></div><div class="msg">Carregando dados do Supabase…</div></div>
+<div id="liveError">
+  <span id="liveErrorMsg">Não foi possível carregar os dados.</span>
+  <button id="liveErrorRetry">Tentar novamente</button>
+</div>
 <div class="app">
 
   <div class="sidebar-backdrop" id="sbBackdrop"></div>
   <nav class="sidebar" id="sidebar">
-    <div class="sb-brand">BARRY CALLEBAUT
-      <small>Fastlog Serviços · Painel Operacional</small>
-    </div>
+    <div class="sb-logo"><img src="logo.jpg" alt="Fastlog Serviços"></div>
     <div class="sb-nav" id="sbNav">
       <div class="sb-sec">Produção</div>
-      <a class="sb-item" data-target="#sec-dimensionamento"><span class="ic">📐</span>Dimensionamento</a>
-      <a class="sb-item" data-target="#sec-presenca-operacional"><span class="ic">📋</span>Presença Diária Operacional</a>
+      <a class="sb-item" data-target="#sec-dimensionamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h8"/><rect x="15" y="10" width="6" height="10" rx="1" fill="currentColor" opacity=".3"/><rect x="19" y="6" width="2" height="14" rx="1" fill="currentColor" opacity=".5"/></svg><span class="sb-item-txt">Dimensionamento</span></a>
+      <a class="sb-item" data-target="#sec-presenca-operacional"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h6a1 1 0 011 1v1h2a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V7a1 1 0 011-1h2V5a1 1 0 011-1z"/><path d="M9 12l2 2 4-4"/></svg><span class="sb-item-txt">Presença Diária Operacional</span></a>
+      <a class="sb-item sb-item-stub" data-target="#sec-em-breve-operacional"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span class="sb-item-txt">Resultado Operacional</span></a>
+      <a class="sb-item sb-item-stub" data-target="#sec-em-breve-produtividade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span class="sb-item-txt">Controle de Produtividade</span></a>
+      <a class="sb-item sb-item-stub" data-target="#sec-em-breve-prodind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="sb-item-txt">Produtividade Individual</span></a>
 
       <div class="sb-sec">Presença &amp; Absenteísmo</div>
-      <a class="sb-item" data-target="#sec-kpi"><span class="ic">📊</span>Visão Geral</a>
-      <a class="sb-item" data-target="#sec-grade"><span class="ic">🗓️</span>Controle de Presença Diária</a>
-      <a class="sb-item" data-target="#sec-graficos"><span class="ic">📈</span>Gráficos</a>
-      <a class="sb-item" data-target="#sec-evolucao"><span class="ic">📉</span>Evolução</a>
-      <a class="sb-item" data-target="#sec-presenca"><span class="ic">🔁</span>Movimentações</a>
-      <a class="sb-item" data-target="#sec-resumo"><span class="ic">🧾</span>Resumo</a>
+      <a class="sb-item" data-target="#sec-kpi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span class="sb-item-txt">Visão Geral</span></a>
+      <a class="sb-item" data-target="#sec-grade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span class="sb-item-txt">Controle de Presença Diária</span></a>
+      <a class="sb-item" data-target="#sec-graficos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="sb-item-txt">Gráficos</span></a>
+      <a class="sb-item" data-target="#sec-evolucao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="sb-item-txt">Evolução</span></a>
+      <a class="sb-item" data-target="#sec-presenca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg><span class="sb-item-txt">Movimentações</span></a>
+      <a class="sb-item" data-target="#sec-resumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span class="sb-item-txt">Resumo</span></a>
 
       <div class="sb-sec">Gestão &amp; Custos</div>
-      <a class="sb-item" data-target="#sec-he"><span class="ic">⏱️</span>Hora Extra</a>
+      <a class="sb-item" data-target="#sec-he"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="13" r="8"/><path d="M9 1h6M12 1v3"/></svg><span class="sb-item-txt">Hora Extra</span></a>
+      <a class="sb-item sb-item-stub" data-target="#sec-em-breve-contratos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/><path d="M12 3v1M12 20v1M3 12h1M20 12h1"/></svg><span class="sb-item-txt">Radar de Contratos</span></a>
     </div>
   </nav>
 
@@ -385,7 +1132,7 @@ button, a.sb-item, select{min-height:36px;}
             <div class="sub">Operado por Fastlog Serviços · dados de presença, dimensionamento e movimentação de pessoal</div>
           </div>
         </div>
-        <div class="period-badge" id="periodBadge">Julho–Agosto/2026 · referência 20/08/2026</div>
+        <div class="period-badge" id="periodBadge">Julho–Agosto/2026 · referência 20/08/2026<span id="liveBadge" class="ok" title="Conectado ao Supabase, atualização em tempo real ativa">● live</span></div>
       </div>
       <div class="filter-bar">
         <div class="fg"><label>Unidade</label><select class="f-unidade" id="f-uni"></select></div>
@@ -400,7 +1147,7 @@ button, a.sb-item, select{min-height:36px;}
 
       <!-- ================= DIMENSIONAMENTO ================= -->
       <section id="sec-dimensionamento">
-        <h2>Dimensionamento</h2>
+        <div class="sec-head"><span class="sec-title">Dimensionamento</span><div class="sec-line"></div></div>
         <p class="section-sub">Quadro solicitado × contratado por Unidade e Cargo/Setor — quadro fixo para o período Julho–Agosto/2026 (não varia por mês).</p>
         <div class="kpi-grid" id="dimKpis"></div>
         <div class="cards-grid" id="dimCards" style="margin-top:16px;"></div>
@@ -408,35 +1155,35 @@ button, a.sb-item, select{min-height:36px;}
 
       <!-- ================= PRESENÇA DIÁRIA OPERACIONAL ================= -->
       <section id="sec-presenca-operacional">
-        <h2>Controle de Presença Diária Operacional</h2>
+        <div class="sec-head"><span class="sec-title">Controle de Presença Diária Operacional</span><div class="sec-line"></div></div>
         <p class="section-sub">Comparativo diário Solicitado × Realizado por Setor/Cargo/Turno. Fonte: quadro de dimensionamento realizado diário.</p>
         <div id="operContainer"></div>
       </section>
 
       <!-- ================= VISÃO GERAL (KPIs) ================= -->
       <section id="sec-kpi">
-        <h2>Visão Geral</h2>
+        <div class="sec-head"><span class="sec-title">Visão Geral</span><div class="sec-line"></div></div>
         <p class="section-sub">Indicadores consolidados de presença, quadro e movimentação, conforme os filtros ativos.</p>
         <div class="kpi-grid" id="kpiGeral"></div>
       </section>
 
       <!-- ================= GRADE DIÁRIA RH ================= -->
       <section id="sec-grade">
-        <h2>Controle de Presença Diária</h2>
+        <div class="sec-head"><span class="sec-title">Controle de Presença Diária</span><div class="sec-line"></div></div>
         <p class="section-sub">Grade dia a dia por colaborador, agrupada por Unidade — Turno.</p>
         <div id="gradeContainer"></div>
       </section>
 
       <!-- ================= GRÁFICOS ================= -->
       <section id="sec-graficos">
-        <h2>Gráficos</h2>
+        <div class="sec-head"><span class="sec-title">Gráficos</span><div class="sec-line"></div></div>
         <p class="section-sub">Presença e absenteísmo consolidados por Unidade, Turno e Cargo.</p>
         <div class="charts-grid" id="graficosContainer"></div>
       </section>
 
       <!-- ================= EVOLUÇÃO ================= -->
       <section id="sec-evolucao">
-        <h2>Evolução</h2>
+        <div class="sec-head"><span class="sec-title">Evolução</span><div class="sec-line"></div></div>
         <p class="section-sub">Tendência dia a dia e mês a mês de presença, faltas e absenteísmo.</p>
         <div class="charts-grid" id="evolucaoCharts" style="margin-bottom:16px;"></div>
         <div id="evolucaoTabela"></div>
@@ -444,32 +1191,199 @@ button, a.sb-item, select{min-height:36px;}
 
       <!-- ================= MOVIMENTAÇÕES ================= -->
       <section id="sec-presenca">
-        <h2>Movimentações · Admissões e Desligamentos</h2>
+        <div class="sec-head"><span class="sec-title">Movimentações · Admissões e Desligamentos</span><div class="sec-line"></div></div>
         <p class="section-sub">Um evento por linha — admissão ou desligamento — sem pareamento entre eles.</p>
         <div id="movimContainer"></div>
       </section>
 
       <!-- ================= RESUMO ================= -->
       <section id="sec-resumo">
-        <h2>Resumo</h2>
+        <div class="sec-head"><span class="sec-title">Resumo</span><div class="sec-line"></div></div>
         <p class="section-sub">Consolidado por Unidade, Mês e Turno.</p>
         <div id="resumoContainer"></div>
       </section>
 
       <!-- ================= HORA EXTRA ================= -->
       <section id="sec-he">
-        <h2>Hora Extra</h2>
+        <div class="sec-head"><span class="sec-title">Hora Extra</span><div class="sec-line"></div></div>
         <p class="section-sub" id="heSub">Apurado a partir do registro de hora extra de cada colaborador (adicional 50% e 100%).</p>
         <div class="kpi-grid" id="heKpis"></div>
         <div id="heTabela" style="margin:16px 0;"></div>
         <div class="charts-grid" id="heCharts"></div>
       </section>
 
+      <!-- ================= RESULTADO OPERACIONAL (EM BREVE) ================= -->
+      <section id="sec-em-breve-operacional">
+        <div class="sec-head"><span class="sec-title">Resultado Operacional</span><div class="sec-line"></div></div>
+        <div class="tbl-card" style="padding:36px 24px;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--tx-secondary);margin-bottom:6px;">🚧 Em breve</div>
+          <p class="section-sub" style="margin:0;">Esta seção do modelo GPA depende de dados de produção/financeiro que ainda não existem na base da Barry Callebaut. Assim que a fonte de dados for definida, o conteúdo será habilitado aqui.</p>
+        </div>
+      </section>
+
+      <!-- ================= CONTROLE DE PRODUTIVIDADE (EM BREVE) ================= -->
+      <section id="sec-em-breve-produtividade">
+        <div class="sec-head"><span class="sec-title">Controle de Produtividade</span><div class="sec-line"></div></div>
+        <div class="tbl-card" style="padding:36px 24px;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--tx-secondary);margin-bottom:6px;">🚧 Em breve</div>
+          <p class="section-sub" style="margin:0;">Esta seção do modelo GPA depende de indicadores de produtividade que ainda não existem na base da Barry Callebaut. Assim que a fonte de dados for definida, o conteúdo será habilitado aqui.</p>
+        </div>
+      </section>
+
+      <!-- ================= PRODUTIVIDADE INDIVIDUAL (EM BREVE) ================= -->
+      <section id="sec-em-breve-prodind">
+        <div class="sec-head"><span class="sec-title">Produtividade Individual</span><div class="sec-line"></div></div>
+        <div class="tbl-card" style="padding:36px 24px;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--tx-secondary);margin-bottom:6px;">🚧 Em breve</div>
+          <p class="section-sub" style="margin:0;">Esta seção do modelo GPA depende de indicadores de produtividade individual que ainda não existem na base da Barry Callebaut. Assim que a fonte de dados for definida, o conteúdo será habilitado aqui.</p>
+        </div>
+      </section>
+
+      <!-- ================= RADAR DE CONTRATOS TEMPORÁRIOS (EM BREVE) ================= -->
+      <section id="sec-em-breve-contratos">
+        <div class="sec-head"><span class="sec-title">Radar de Contratos Temporários</span><div class="sec-line"></div></div>
+        <div class="tbl-card" style="padding:36px 24px;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--tx-secondary);margin-bottom:6px;">🚧 Em breve</div>
+          <p class="section-sub" style="margin:0;">Esta seção do modelo GPA depende de dados de contratos temporários que ainda não existem na base da Barry Callebaut. Assim que a fonte de dados for definida, o conteúdo será habilitado aqui.</p>
+        </div>
+      </section>
+
+      <footer>Fastlog Serviços &middot; Dashboard Operacional &amp; RH &mdash; BARRY CALLEBAUT &middot; 2026</footer>
+
     </div>
   </div>
 </div>
 
-<script src="data_block_full.js"></script>
+<script>
+'use strict';
+/* ============================================================
+   BACKEND VIVO — carga a partir do Supabase (substitui o
+   antigo data_block_full.js estático). Ver seção 2.6 do prompt.
+   ============================================================ */
+const SUPABASE_URL = 'https://tcnfntipkkzaglfgkyyj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjbmZudGlwa2t6YWdsZmdreXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNjc1NTEsImV4cCI6MjEwMjg0MzU1MX0.ctR2trRUnSHSudOVWgLBcH_58qbKZHwUGgIWgGw4SuM';
+const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const DASH_KEYS = ['UNIDS','MESES','MES_NUM','DADOS','DIM_DADOS','DIM_CARGO_DADOS','OPER_DADOS','PRESENCA_DADOS','RH_DADOS','PROD_IND_DADOS'];
+const DASH_DEFAULTS = {UNIDS:[],MESES:[],MES_NUM:{},DADOS:[],DIM_DADOS:[],DIM_CARGO_DADOS:[],OPER_DADOS:[],PRESENCA_DADOS:[],RH_DADOS:[],PROD_IND_DADOS:{}};
+
+// Constantes de dados -- populadas de forma assíncrona a partir da tabela
+// public.dashboard_data. Começam vazias/no formato correto para que qualquer
+// função que rode antes da 1ª carga não quebre (a UI de "carregando" cobre a
+// tela inteira até a 1ª carga terminar, então isso nunca fica visível).
+let UNIDS = [], MESES = [], MES_NUM = {}, DADOS = [], DIM_DADOS = [], DIM_CARGO_DADOS = [],
+    OPER_DADOS = [], PRESENCA_DADOS = [], RH_DADOS = [], PROD_IND_DADOS = {};
+
+// Data de referência do dashboard: usada só para marcar dias futuros na Grade
+// (isFutureDay) e como ano/mês-base do calendário de cada mês exibido. Nesta
+// versão com backend vivo o "hoje" é o próprio dia real do navegador (o
+// dataset é atualizado continuamente, então não faz sentido congelar uma data
+// de geração como no modelo estático) -- ver relatório de entrega para a
+// justificativa desta divergência documentada em relação à seção 2.2 do prompt.
+const REF_DATE = new Date().toISOString().slice(0,10);
+
+let _liveLoadedOnce = false;
+function liveSetLoading(on){
+  const el = document.getElementById('liveLoading');
+  if(el) el.style.display = on ? 'flex' : 'none';
+}
+function liveSetError(msg){
+  const bar = document.getElementById('liveError');
+  const msgEl = document.getElementById('liveErrorMsg');
+  if(!bar) return;
+  if(msg){ msgEl.textContent = msg; bar.classList.add('show'); }
+  else { bar.classList.remove('show'); }
+}
+function liveSetBadge(state){
+  const b = document.getElementById('liveBadge');
+  if(!b) return;
+  if(state==='ok'){ b.className='ok'; b.textContent='● live'; b.title='Conectado ao Supabase, atualização em tempo real ativa'; }
+  else { b.className='stale'; b.textContent='● reconectando'; b.title='Conexão em tempo real interrompida -- tentando reconectar'; }
+}
+
+async function loadDashboardData(){
+  liveSetError(null);
+  if(!_liveLoadedOnce) liveSetLoading(true);
+  try{
+    const { data, error } = await sbClient.from('dashboard_data').select('key,value');
+    if(error) throw error;
+    const byKey = {};
+    (data||[]).forEach(row=>{ byKey[row.key] = row.value; });
+    const missing = DASH_KEYS.filter(k=> !(k in byKey));
+    if(!data || data.length===0){
+      throw new Error('A tabela dashboard_data está vazia ou inacessível (verifique as permissões de leitura/RLS).');
+    }
+    UNIDS = byKey.UNIDS !== undefined ? byKey.UNIDS : DASH_DEFAULTS.UNIDS;
+    MESES = byKey.MESES !== undefined ? byKey.MESES : DASH_DEFAULTS.MESES;
+    MES_NUM = byKey.MES_NUM !== undefined ? byKey.MES_NUM : DASH_DEFAULTS.MES_NUM;
+    DADOS = byKey.DADOS !== undefined ? byKey.DADOS : DASH_DEFAULTS.DADOS;
+    DIM_DADOS = byKey.DIM_DADOS !== undefined ? byKey.DIM_DADOS : DASH_DEFAULTS.DIM_DADOS;
+    DIM_CARGO_DADOS = byKey.DIM_CARGO_DADOS !== undefined ? byKey.DIM_CARGO_DADOS : DASH_DEFAULTS.DIM_CARGO_DADOS;
+    OPER_DADOS = byKey.OPER_DADOS !== undefined ? byKey.OPER_DADOS : DASH_DEFAULTS.OPER_DADOS;
+    PRESENCA_DADOS = byKey.PRESENCA_DADOS !== undefined ? byKey.PRESENCA_DADOS : DASH_DEFAULTS.PRESENCA_DADOS;
+    RH_DADOS = byKey.RH_DADOS !== undefined ? byKey.RH_DADOS : DASH_DEFAULTS.RH_DADOS;
+    PROD_IND_DADOS = byKey.PROD_IND_DADOS !== undefined ? byKey.PROD_IND_DADOS : DASH_DEFAULTS.PROD_IND_DADOS;
+
+    if(missing.length){
+      console.warn('Chaves ausentes em dashboard_data (usando padrão vazio):', missing.join(', '));
+    }
+
+    const badgeEl = document.getElementById('periodBadge');
+    if(badgeEl){
+      const periodo = MESES.length ? (MESES.length>1 ? MESES[0]+'–'+MESES[MESES.length-1] : MESES[0]) + '/' + REF_DATE.slice(0,4) : 'sem período';
+      const refFmt = REF_DATE.slice(8,10)+'/'+REF_DATE.slice(5,7)+'/'+REF_DATE.slice(0,4);
+      const liveSpan = document.getElementById('liveBadge');
+      badgeEl.innerHTML = esc(periodo) + ' · referência ' + refFmt + ' ';
+      if(liveSpan) badgeEl.appendChild(liveSpan);
+    }
+
+    // rotina COMPLETA de carga -- roda de novo em toda atualização (inicial E
+    // realtime), nunca um re-render parcial (seção 2.6 do prompt).
+    preprocess();
+    initFilters();
+    renderAll();
+
+    liveSetLoading(false);
+    liveSetBadge('ok');
+    _liveLoadedOnce = true;
+  } catch(err){
+    console.error('Falha ao carregar dashboard_data do Supabase:', err);
+    liveSetLoading(false);
+    liveSetBadge('stale');
+    const detail = (err && err.message) ? err.message : String(err);
+    if(_liveLoadedOnce){
+      // já havia dados na tela de uma carga anterior -- não apaga o que já
+      // está renderizado, só avisa que a atualização mais recente falhou.
+      liveSetError('Não foi possível atualizar os dados agora (mantendo a última versão carregada). Detalhe: ' + detail);
+    } else {
+      liveSetError('Não foi possível carregar os dados do Supabase. Detalhe: ' + detail);
+      // Estado de "carregando" permanece coberto pelo overlay em vez de
+      // renderizar a tela como se houvesse zero dados -- nunca mostrar KPIs
+      // zerados por causa de uma falha de rede/permissão.
+      liveSetLoading(true);
+      document.getElementById('liveLoading').querySelector('.msg').textContent =
+        'Não foi possível carregar os dados. Veja o aviso acima e tente novamente.';
+      document.getElementById('liveLoading').querySelector('.spinner').style.display = 'none';
+    }
+  }
+}
+
+function setupRealtime(){
+  sbClient
+    .channel('dashboard_data_changes')
+    .on('postgres_changes', { event:'*', schema:'public', table:'dashboard_data' }, ()=>{
+      // qualquer mudança (import confirmado pela analista) -> repete a carga
+      // completa, não um patch parcial (seção 2.6 do prompt).
+      loadDashboardData();
+    })
+    .subscribe((status)=>{
+      if(status === 'SUBSCRIBED') liveSetBadge('ok');
+      else if(status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') liveSetBadge('stale');
+    });
+}
+
+document.getElementById('liveErrorRetry')?.addEventListener('click', loadDashboardData);
+</script>
 <script>
 'use strict';
 /* ============================================================
@@ -772,7 +1686,15 @@ function populateSelect(sel, values, allLabel){
     const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);
   });
 }
+let _filtersWired = false;
 function initFilters(){
+  // NOTA (backend vivo, seção 2.6 do prompt): esta função roda de novo a
+  // cada carga de dados (inicial E a cada evento de realtime), não só uma
+  // vez -- porque um novo import pode trazer Unidade/Turno/Cargo inéditos
+  // que precisam aparecer nos <select>. Os listeners de evento, porém, só
+  // podem ser presos UMA vez (senão cada novo import duplicaria os
+  // handlers de 'change' nos mesmos elementos <select>, que persistem no
+  // DOM entre recargas -- só as <option> internas são recriadas).
   const selUnidade = document.querySelectorAll('.f-unidade');
   const selMes     = document.querySelectorAll('.f-mes');
   const selTurno   = document.querySelectorAll('.f-turno');
@@ -781,7 +1703,14 @@ function initFilters(){
   selMes.forEach(s=>populateSelect(s, MESES, 'Todos'));
   selTurno.forEach(s=>populateSelect(s, TURNOS, 'Todos'));
   selCargo.forEach(s=>populateSelect(s, CARGOS, 'Todos'));
-  selMes.forEach(s=>{ s.value = state.mes; });
+  // restaura a seleção corrente (se ainda existir na lista repopulada)
+  selUnidade.forEach(s=>{ if(UNIDS.includes(state.unidade)) s.value = state.unidade; });
+  selMes.forEach(s=>{ if(MESES.includes(state.mes)) s.value = state.mes; });
+  selTurno.forEach(s=>{ if(TURNOS.includes(state.turno)) s.value = state.turno; });
+  selCargo.forEach(s=>{ if(CARGOS.includes(state.cargo)) s.value = state.cargo; });
+
+  if(_filtersWired) return;
+  _filtersWired = true;
 
   function syncAndRender(field, val){
     state[field]=val;
@@ -1097,9 +2026,11 @@ function renderGradeRH(){
   const activeMonthNums = singleMonth ? [MES_NUM[state.mes]] : MESES.map(m=>MES_NUM[m]);
 
   const totalSubW = GRADE_COLW.colab + GRADE_COLW.unidade + GRADE_COLW.cargo + GRADE_COLW.turno;
+  const N_TOT_COLS = 7; // Presenças, Faltas Just., Faltas Injust., Folgas, HE 50%, HE 100%, HE Total
   let colgroup = `<colgroup><col style="width:${totalSubW}px">`;
   days.forEach(()=> colgroup += `<col style="width:30px">`);
-  colgroup += `<col style="width:78px"><col style="width:78px"><col style="width:78px"><col style="width:78px"></colgroup>`;
+  for(let i=0;i<N_TOT_COLS;i++) colgroup += `<col style="width:74px">`;
+  colgroup += `</colgroup>`;
 
   const extraCSS = `<style>
     #gradeRH .stc-flex{width:${totalSubW}px;}
@@ -1130,7 +2061,13 @@ function renderGradeRH(){
     const fg = folgaGeralSet.has(iso) ? ' folga-geral' : '';
     thead += `<th class="${wknd}${fg}">${fmtDateShort(iso)}<br>${weekdayAbbrev(iso)}</th>`;
   });
-  thead += `<th class="tot-head">Total<br>Presenças</th><th class="tot-head">Total<br>Faltas Just.</th><th class="tot-head">Total<br>Faltas Injust.</th><th class="tot-head">Total<br>Folgas</th>`;
+  thead += `<th class="tot-head gt-tot gtc-p" title="Total de Presenças no Mês">Total<br>Presenças</th>`
+    + `<th class="tot-head gt-tot gtc-fj" title="Total de Faltas Justificadas no Mês">Total<br>Faltas Just.</th>`
+    + `<th class="tot-head gt-tot gtc-fi" title="Total de Faltas Injustificadas no Mês">Total<br>Faltas Injust.</th>`
+    + `<th class="tot-head gt-tot gtc-flg" title="Total de Folgas no Mês">Total<br>Folgas</th>`
+    + `<th class="tot-head gt-tot gtc-he5" title="Total de Horas Extras a 50% no Mês">Total<br>HE 50%</th>`
+    + `<th class="tot-head gt-tot gtc-he1" title="Total de Horas Extras a 100% no Mês">Total<br>HE 100%</th>`
+    + `<th class="tot-head gt-tot" title="Horas Extras Totais no Mês">Total<br>HE Total</th>`;
   thead += '</tr></thead>';
 
   let tbody = '<tbody>';
@@ -1141,7 +2078,7 @@ function renderGradeRH(){
     });
     if(colabs.length===0) return;
 
-    tbody += `<tr class="grp-header"><td class="stcol">${esc(g.unidade)} — ${esc(g.turno)}</td><td colspan="${days.length+4}"></td></tr>`;
+    tbody += `<tr class="grp-header"><td class="stcol">${esc(g.unidade)} — ${esc(g.turno)}</td><td colspan="${days.length+N_TOT_COLS}"></td></tr>`;
 
     const resumoDefs = [
       {code:'FER', label:'Feriado', cls:'r-fer'},
@@ -1154,6 +2091,7 @@ function renderGradeRH(){
     ];
     resumoDefs.forEach(def=>{
       let cells = '';
+      let rowTot = 0;
       days.forEach(iso=>{
         if(isFutureDay(iso)){ cells += '<td class="st-empty">·</td>'; return; }
         const mnum = +iso.slice(5,7);
@@ -1164,9 +2102,19 @@ function renderGradeRH(){
           if(def.code==='FI' && st==='AT') st='FI';
           if(st===def.code) cnt++;
         });
+        rowTot += cnt;
         cells += `<td>${cnt||''}</td>`;
       });
-      tbody += `<tr class="tr-res-label ${def.cls}"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">${esc(def.label)}</div></div></td>${cells}<td></td><td></td><td></td><td></td></tr>`;
+      // colunas de HE nao se aplicam as linhas de resumo por status — ficam
+      // sempre "—", igual as demais categorias que nao batem com a linha atual.
+      const heBlank = '<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td>';
+      let totCells;
+      if(def.code==='P') totCells = `<td class="gt-tot${rowTot>0?' gtv-p':''}">${rowTot||'—'}</td><td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td>${heBlank}`;
+      else if(def.code==='FJ') totCells = `<td class="gt-tot">—</td><td class="gt-tot${rowTot>0?' gtv-fj':''}">${rowTot||'—'}</td><td class="gt-tot">—</td><td class="gt-tot">—</td>${heBlank}`;
+      else if(def.code==='FI') totCells = `<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot${rowTot>0?' gtv-fi':''}">${rowTot||'—'}</td><td class="gt-tot">—</td>${heBlank}`;
+      else if(def.code==='FOLGA') totCells = `<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot${rowTot>0?' gtv-flg':''}">${rowTot||'—'}</td>${heBlank}`;
+      else totCells = `<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td>${heBlank}`;
+      tbody += `<tr class="tr-res-label ${def.cls}"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">${esc(def.label)}</div></div></td>${cells}${totCells}</tr>`;
     });
 
     let pctCells = '';
@@ -1183,18 +2131,20 @@ function renderGradeRH(){
       const pct = pctPresencaFromCounts(c);
       pctCells += hasAny ? `<td>${pct.toFixed(1)}%</td>` : '<td class="st-empty">·</td>';
     });
-    tbody += `<tr class="tr-res-label r-pct"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">% de Presença</div></div></td>${pctCells}<td></td><td></td><td></td><td></td></tr>`;
+    const pctTotPlaceholders = Array(7).fill('<td class="gt-tot" style="background:var(--indigo) !important"></td>').join('');
+    tbody += `<tr class="tr-res-label r-pct"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">% de Presença</div></div></td>${pctCells}${pctTotPlaceholders}</tr>`;
 
     colabs.forEach(c=>{
       const nomeShort = c.nome.length>16 ? c.nome.slice(0,16)+'…' : c.nome;
       let cells = '';
-      let tP=0,tFJ=0,tFI=0,tFLG=0;
+      let tP=0,tFJ=0,tFI=0,tFLG=0,tHE5=0,tHE1=0;
       days.forEach(iso=>{
         const mnum = +iso.slice(5,7);
         const active = isColabActiveForMonth(c, mnum);
         const st = c.dias ? c.dias[iso] : undefined;
+        const heInfo = active ? (c.he && c.he[iso]) : undefined;
+        if(heInfo){ tHE5 += hhmmToDecimal(heInfo.ex50); tHE1 += hhmmToDecimal(heInfo.ex100); }
         if(st===undefined){ cells += '<td class="st-empty">·</td>'; return; }
-        const heInfo = c.he && c.he[iso];
         const heCls = heInfo ? ' he-mark' : '';
         let title = '';
         if(heInfo){
@@ -1211,6 +2161,7 @@ function renderGradeRH(){
           else if(st==='FOLGA') tFLG++;
         }
       });
+      const tHET = tHE5 + tHE1;
       tbody += `<tr>
         <td class="stcol"><div class="stc-flex">
           <div class="colab-name" title="${esc(c.nome)}">${esc(nomeShort)}</div>
@@ -1219,7 +2170,7 @@ function renderGradeRH(){
           <div class="turno-cell">${esc(g.turno)}</div>
         </div></td>
         ${cells}
-        <td class="tot-p">${tP}</td><td class="tot-fj">${tFJ}</td><td class="tot-fi">${tFI}</td><td class="tot-flg">${tFLG}</td>
+        <td class="gt-tot${tP>0?' gtv-p':''}">${tP||'—'}</td><td class="gt-tot${tFJ>0?' gtv-fj':''}">${tFJ||'—'}</td><td class="gt-tot${tFI>0?' gtv-fi':''}">${tFI||'—'}</td><td class="gt-tot${tFLG>0?' gtv-flg':''}">${tFLG||'—'}</td><td class="gt-tot${tHE5>0?' gtv-he5':''}">${tHE5>0?hoursToHHMM(tHE5):'—'}</td><td class="gt-tot${tHE1>0?' gtv-he1':''}">${tHE1>0?hoursToHHMM(tHE1):'—'}</td><td class="gt-tot${tHET>0?' gtv-het':''}">${tHET>0?hoursToHHMM(tHET):'—'}</td>
       </tr>`;
     });
   });
@@ -1232,18 +2183,19 @@ function renderGradeRH(){
     </div>
     <div class="uni-scroll" id="gradeRH"><table class="tgrade-uni">${colgroup}${thead}${tbody}</table></div>
     <div class="grade-legend">
-      <div class="legend-item"><span class="legend-swatch" style="background:#0E7A43"></span>P — Presença</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#B45309"></span>FJ — Falta Justificada</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#C0281C"></span>FI — Falta Injustificada</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#64748B"></span>FOLGA — Folga</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#6B21A8"></span>FER — Feriado</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#0079C2"></span>FERIAS — Férias</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#334155"></span>D — Desligado</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#C0281C"></span>AT — Afastamento/Atestado</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#2D5099"></span>INT — Integração/Treinamento</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#4285F4"></span>P — Presença</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#ED7D31"></span>FJ — Falta Justificada</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#ED0000"></span>FI — Falta Injustificada</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#000"></span>FOLGA — Folga</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#9900FF"></span>FER — Feriado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#548235"></span>FERIAS — Férias</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#F1C232"></span>D — Desligado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#ED0000"></span>AT — Afastamento/Atestado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#065F46"></span>INT — Integração/Treinamento</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#64748B"></span>Fim de semana</div>
       <div class="legend-item"><span class="legend-dot"></span>Hora Extra (passe o mouse sobre a célula)</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#ED0000"></span>Folga Geral (ninguém trabalhou)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#1A56DB"></span>Totais: Presenças / HE 50% (roxo) / HE 100% (vermelho) no mês</div>
     </div>`;
   wireArrowButtons('gradeArrowL','gradeArrowR','gradeRH');
 }
@@ -1324,6 +2276,7 @@ function renderGraficos(){
     <div class="ch"><h3>% Presença por Unidade</h3><div class="ch-canvas-wrap"><canvas id="chPresUnidade"></canvas></div></div>
     <div class="ch"><h3>Presenças × Faltas (FJ+FI) por Unidade</h3><div class="ch-canvas-wrap"><canvas id="chPresFaltas"></canvas></div></div>
     <div class="ch"><h3>% Presença por Turno</h3><div class="ch-canvas-wrap"><canvas id="chPresTurno"></canvas></div></div>
+    <div class="ch-donut"><h3>Absenteísmo · Presença × Faltas</h3><div class="ch-canvas-wrap" style="position:relative"><canvas id="chAbsenteismo"></canvas><div class="donut-center-label" id="absenteismoDonutCenter"></div></div></div>
     <div class="ch"><h3>% Presença por Setor</h3><div class="ch-canvas-wrap"><canvas id="chPresSetor"></canvas></div></div>
   `;
   function statsBy(dimFn){
@@ -1368,6 +2321,23 @@ function renderGraficos(){
       options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}},
         plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{}}}
     });
+  });
+  renderChartSafe('chAbsenteismo','Absenteísmo — Presença × Faltas', ()=>{
+    const opts = {unidade:state.unidade, mes:state.mes, turno:state.turno, cargo:state.cargo};
+    const counts = countStatuses(collectDayStatuses(opts));
+    const fiEff = counts.FI + counts.AT;
+    const absLabels = ['Presença','Falta Justificada','Falta Injustificada'];
+    const absData = [counts.P, counts.FJ, fiEff];
+    const absColors = ['#0079C2','#B45309','#C0281C'];
+    destroyChart('absenteismo');
+    charts.absenteismo = new Chart(document.getElementById('chAbsenteismo'), {
+      type:'doughnut',
+      data:{labels:absLabels, datasets:[{data:absData, backgroundColor:absColors, borderWidth:2, borderColor:'#fff', hoverOffset:6}]},
+      options:{responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}},
+        tooltip:{callbacks:{label:ctx=>{ const tot=absData.reduce((a,b)=>a+b,0); const pct=tot>0?(ctx.parsed/tot*100).toFixed(1):'0.0'; return `${ctx.label}: ${ctx.parsed} (${pct}%)`; }}}}}
+    });
+    const pct = pctPresencaFromCounts(counts);
+    document.getElementById('absenteismoDonutCenter').innerHTML = `<span class="v">${pct.toFixed(1)}%</span><span class="l">Presença</span>`;
   });
   renderChartSafe('chPresTurno','% Presença por Turno', ()=>{
     const buckets = statsBy(r=>r.turno);
@@ -1723,11 +2693,10 @@ function setupHamburger(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  preprocess();
-  initFilters();
-  renderAll();
   setupScrollSpy();
   setupHamburger();
+  loadDashboardData();
+  setupRealtime();
 });
 </script>
 </body>
