@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script>if('scrollRestoration' in history){history.scrollRestoration='manual';}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Operacional &amp; RH — BARRY CALLEBAUT</title>
@@ -2687,11 +2688,13 @@ function setupHamburger(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  window.scrollTo(0,0);
   setupScrollSpy();
   setupHamburger();
   loadDashboardData();
   setupRealtime();
 });
+window.addEventListener('load', ()=>{ window.scrollTo(0,0); });
 </script>
 </body>
 </html>
