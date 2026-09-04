@@ -200,6 +200,15 @@ section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-prima
    TABELA STICKY (arquitetura de coluna única, seção 5-A/5-B)
    ============================================================ */
 .uni-scroll{height:clamp(380px, 60vh, 620px); overflow:auto; border:1px solid var(--border); border-radius:10px; background:#fff; position:relative;}
+/* #gradeContainer recebe sua propria rolagem horizontal, independente da
+   pagina. Motivo: a Grade Diaria tem uma largura minima garantida (colunas
+   fixas da esquerda + totais fixos da direita + espaco para alguns dias),
+   para as colunas fixas nunca se sobreporem. Em janelas mais estreitas essa
+   largura minima pode nao caber — sem esta regra, o excesso "vazava" e
+   fazia a PAGINA INTEIRA (cabecalho, filtros, menu) deslocar para o lado.
+   Com max-width:100% + overflow-x:auto aqui, so esta secao ganha uma barra
+   de rolagem propria quando necessario, e o resto da pagina fica parado. */
+#gradeContainer{max-width:100%; overflow-x:auto;}
 .table-scroll-controls{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
 .arrow-btn{
   display:none; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px;
