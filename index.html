@@ -171,7 +171,7 @@ section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-prima
 /* ============================================================
    CARDS GRID GENÉRICO
    ============================================================ */
-.cards-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px;}
+.cards-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; min-width:0;}
 
 /* ============================================================
    DIMENSIONAMENTO
@@ -328,10 +328,10 @@ table.tgrade-uni tbody tr.oper-total-row td.stcol{text-align:right; font-weight:
 /* ============================================================
    GRÁFICOS
    ============================================================ */
-.charts-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(440px,1fr)); gap:16px;}
+.charts-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(440px,1fr)); gap:16px; min-width:0;}
 .ch, .ch-donut, .ch-hbar{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,27,45,.05);}
 .ch h3, .ch-donut h3, .ch-hbar h3{font-size:12.5px; font-weight:700; margin:0 0 10px; color:var(--tx-primary);}
-.ch-canvas-wrap{position:relative; height:280px;}
+.ch-canvas-wrap{position:relative; height:280px; min-width:0;}
 .ch-donut .ch-canvas-wrap{height:240px;}
 .chart-fallback-msg{padding:40px 10px; text-align:center; color:var(--tx-secondary); font-size:12px; font-weight:600;}
 
@@ -366,6 +366,7 @@ table.std-table tbody tr:last-child td{border-bottom:none;}
 @media (max-width:1300px){
   .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));}
   .charts-grid{grid-template-columns:repeat(auto-fit,minmax(380px,1fr));}
+  .cards-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
 }
 @media (max-width:1024px){
   .content{padding:18px 16px 50px;}
@@ -375,7 +376,8 @@ table.std-table tbody tr:last-child td{border-bottom:none;}
 }
 @media (max-width:900px){
   .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
-  .charts-grid{grid-template-columns:1fr;}
+  .charts-grid{grid-template-columns:minmax(0,1fr);}
+  .cards-grid{grid-template-columns:minmax(0,1fr);}
   .fg{min-width:130px;}
 }
 @media (max-width:768px){
@@ -708,9 +710,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx-primary);font-s
 
 
 
-.ch{position:relative;height:240px}
+.ch{position:relative;min-height:240px;min-width:0;}
 
-.ch-hbar{height:260px;transition:height .15s ease}
+.ch-hbar{min-height:260px;min-width:0;transition:height .15s ease}
 
 
 /* ── TABS DE EVOLUÇÃO ── */
@@ -999,11 +1001,12 @@ img,svg{max-width:100%}
 @media(max-width:768px){
   .content{padding:16px 14px}
   .topbar{padding:0 14px;height:auto;min-height:var(--topbar-h);gap:10px}
+  .period-badge{white-space:normal;max-width:100%;line-height:1.5;}
   .filter-bar,.pres-filtros,.dim-legend{padding:9px 14px}
   .kpi-grid,.g2{grid-template-columns:repeat(2,1fr)}
 
 
-  .sec-title{font-size:11px}
+  .sec-title{font-size:11px;white-space:normal}
 
 
 
@@ -1030,11 +1033,12 @@ img,svg{max-width:100%}
   }
 
   .topbar{padding:0 14px;padding-top:env(safe-area-inset-top);height:auto;min-height:var(--topbar-h);gap:10px}
+  .period-badge{white-space:normal;max-width:100%;line-height:1.5;}
   .filter-bar,.pres-filtros,.dim-legend{padding:9px 14px}
   .kpi-grid,.g2{grid-template-columns:1fr}
 
 
-  .ch{height:210px}
+  .ch{min-height:210px}
 
   .kpi{padding:12px 13px}
 
@@ -1088,9 +1092,9 @@ img,svg{max-width:100%}
 
 
 
-  .ch{height:300px}
+  .ch{min-height:300px}
 
-  .ch-donut{height:280px}
+  .ch-donut{min-height:280px}
   .ch-hbar{min-height:300px}
   .donut-center-lbl .v{font-size:26px}
   .donut-center-lbl .l{font-size:11px}
@@ -1104,9 +1108,9 @@ img,svg{max-width:100%}
   body{font-size:17px}
   .content{max-width:2600px}
 
-  .ch{height:360px}
+  .ch{min-height:360px}
 
-  .ch-donut{height:320px}
+  .ch-donut{min-height:320px}
   .ch-hbar{min-height:340px}
   .donut-center-lbl .v{font-size:30px}
   .donut-center-lbl .l{font-size:12px}
@@ -1128,7 +1132,7 @@ img,svg{max-width:100%}
 .gl-item b.mc-af,.gl-item b.mc-susp,.gl-item b.mc-transf,.gl-item b.mc-int{font-size:10.5px;text-transform:none}
 
 /* ── Gráficos de rosca (doughnut) — Absenteísmo e Produção, cores Bimbo ── */
-.ch-donut{position:relative;height:240px;display:flex;align-items:center;justify-content:center}
+.ch-donut{position:relative;min-height:240px;min-width:0;display:flex;align-items:center;justify-content:center}
 
 
 
