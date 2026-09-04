@@ -73,17 +73,17 @@ button{font-family:var(--font); cursor:pointer;}
 }
 .sb-brand{padding:18px 18px 10px; font-size:15px; font-weight:800; color:#fff; letter-spacing:.3px; line-height:1.3;}
 .sb-brand small{display:block; font-size:10px; font-weight:600; color:var(--sb-text); letter-spacing:.6px; text-transform:uppercase; margin-top:3px;}
-.sb-logo{padding:18px 18px 14px; display:flex; align-items:center; justify-content:center;}
-.sb-logo img{height:44px; width:auto; max-width:100%; background:#fff; border-radius:6px; padding:6px 14px; object-fit:contain; flex-shrink:0;}
+.sb-logo{padding:0 18px; display:flex; align-items:center; justify-content:center; gap:10px; height:56px; flex-shrink:0; border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo img{height:48px; width:auto; max-width:100%; background:#fff; border-radius:4px; padding:4px 10px; object-fit:contain; flex-shrink:0;}
 .sb-nav{flex:1; padding:6px 0 24px;}
 .sb-sec{padding:16px 18px 6px; font-size:9px; color:var(--sb-text); text-transform:uppercase; letter-spacing:1.2px; font-weight:700;}
 .sb-item{
-  display:flex; align-items:center; gap:9px; padding:9px 18px; margin:1px 8px; border-radius:7px;
-  color:var(--sb-text); font-size:12.5px; font-weight:500; text-decoration:none; cursor:pointer;
-  min-height:32px; transition:background .12s;
+  display:flex; align-items:center; gap:11px; padding:9px 18px; border-left:3px solid transparent;
+  color:var(--sb-text); font-size:13px; font-weight:500; text-decoration:none; cursor:pointer;
+  transition:all .15s; white-space:nowrap;
 }
 .sb-item:hover{background:var(--sb-hover); color:#fff;}
-.sb-item.active{background:rgba(0,121,194,0.18); color:var(--sb-text-act); font-weight:500;}
+.sb-item.active{background:rgba(0,121,194,0.18); color:var(--sb-text-act); font-weight:500; border-left-color:var(--sb-active,var(--blue));}
 .sb-item .ic{width:16px; text-align:center; flex-shrink:0; font-size:13px;}
 
 /* ---------- MAIN ---------- */
@@ -93,11 +93,11 @@ button{font-family:var(--font); cursor:pointer;}
   background:#fff; border-bottom:1px solid var(--border); padding:14px 26px;
   display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
 }
-.topbar h1{font-size:17px; font-weight:800; margin:0; color:var(--tx-primary);}
+.topbar h1{font-size:15px; font-weight:700; margin:0; color:var(--tx-primary);}
 .topbar .sub{font-size:11.5px; color:var(--tx-secondary); margin-top:2px; font-weight:500;}
 .period-badge{
-  background:var(--blue-light); color:var(--blue-dark); font-weight:700; font-size:11.5px;
-  padding:6px 12px; border-radius:20px; white-space:nowrap;
+  background:var(--blue-light); color:var(--blue); font-weight:600; font-size:11px;
+  padding:3px 10px; border-radius:20px; white-space:nowrap;
 }
 .hamburger-btn{display:none; background:none; border:1px solid var(--border); border-radius:8px; width:40px; height:40px; align-items:center; justify-content:center; font-size:18px; color:var(--tx-primary);}
 .filter-bar{
@@ -116,7 +116,7 @@ button{font-family:var(--font); cursor:pointer;}
 }
 .btn-clear:hover{background:var(--red-bg); color:var(--red); border-color:#F3D3D0;}
 
-.content{padding:22px 26px 60px; max-width:2400px;}
+.content{padding:22px 26px 60px;}
 section{scroll-margin-top:132px; margin-bottom:44px;}
 section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-primary);}
 .section-sub{font-size:12px; color:var(--tx-secondary); margin:0 0 16px; font-weight:500;}
@@ -129,14 +129,19 @@ section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-prima
   background:var(--card); border-left:4px solid var(--blue); border-radius:8px; box-shadow:0 1px 3px rgba(15,27,45,.06);
   padding:15px 16px;
 }
-.kpi .kpi-label{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--tx-secondary); margin-bottom:6px;}
-.kpi .kpi-value{font-size:28px; font-weight:900; color:var(--tx-primary); line-height:1.1;}
+.kpi .kpi-label{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--tx-muted); margin-bottom:7px;}
+.kpi .kpi-value{font-size:28px; font-weight:900; color:var(--blue); line-height:1; margin-bottom:5px; font-variant-numeric:tabular-nums;}
 .kpi .kpi-sub{font-size:11px; color:var(--tx-secondary); margin-top:4px; font-weight:600;}
 .kpi.acc-green{border-left-color:var(--green);}
 .kpi.acc-amber{border-left-color:var(--amber);}
 .kpi.acc-red{border-left-color:var(--red);}
 .kpi.acc-purple{border-left-color:var(--purple);}
 .kpi.acc-indigo{border-left-color:var(--indigo);}
+.kpi.acc-green .kpi-value{color:var(--green);}
+.kpi.acc-amber .kpi-value{color:var(--amber);}
+.kpi.acc-red .kpi-value{color:var(--red);}
+.kpi.acc-purple .kpi-value{color:var(--purple);}
+.kpi.acc-indigo .kpi-value{color:var(--indigo);}
 
 /* ============================================================
    BADGES / CHIPS DE SEVERIDADE (reutilizáveis)
@@ -166,7 +171,7 @@ section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-prima
 /* ============================================================
    CARDS GRID GENÉRICO
    ============================================================ */
-.cards-grid{display:grid; grid-template-columns:1fr; gap:16px;}
+.cards-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px;}
 
 /* ============================================================
    DIMENSIONAMENTO
@@ -217,14 +222,14 @@ section h2{font-size:17px; font-weight:800; margin:0 0 3px; color:var(--tx-prima
 table.tgrade-uni, table.tgrade{border-collapse:separate; border-spacing:0; table-layout:fixed; width:max-content; min-width:100%;}
 table.tgrade-uni th, table.tgrade-uni td,
 table.tgrade th, table.tgrade td{box-sizing:border-box;}
-table.tgrade-uni thead th{background:var(--sb-bg); color:#fff; font-size:9.5px; font-weight:700; text-align:center; padding:6px 3px; border-right:1px solid rgba(255,255,255,.08); white-space:normal; line-height:1.35;}
+table.tgrade-uni thead th{background:var(--indigo); color:#fff; font-size:9.5px; font-weight:700; text-align:center; padding:6px 3px; border-right:1px solid rgba(255,255,255,.08); white-space:normal; line-height:1.35;}
 table.tgrade-uni thead tr:first-child th{padding-top:8px;}
 table.tgrade-uni thead tr:last-child th{padding-bottom:8px;}
 table.tgrade-uni tbody td{font-size:11px; text-align:center; padding:5px 3px; border-bottom:1px solid var(--border-light); border-right:1px solid var(--border-light); white-space:nowrap;}
 table.tgrade-uni tbody tr:hover td:not(.stcol){background:#F7FAFD;}
 
 table.tgrade-uni td.stcol, table.tgrade-uni th.stcol{position:sticky; left:0; z-index:2; padding:0 !important; box-shadow:2px 0 0 var(--indigo); background:#fff;}
-table.tgrade-uni thead th.stcol{z-index:6; background:var(--sb-bg);}
+table.tgrade-uni thead th.stcol{z-index:6; background:var(--indigo);}
 .stc-flex{display:flex; height:100%; width:100%;}
 .stc-flex>div{box-sizing:border-box; display:flex; align-items:center; justify-content:center; padding:5px 6px; border-right:1px solid var(--border-light); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .stc-flex>div:last-child{border-right:none;}
@@ -259,20 +264,20 @@ td.stcol .turno-cell{font-size:11.5px; font-weight:600; color:#0079C2;}
 
 .col-weekend{background:#F3F5F8;}
 table.tgrade-uni tbody tr:hover td.col-weekend{background:#E2E9F0;}
-th.col-weekend-head{background:#16283F !important;}
+th.col-weekend-head{background:#64748B !important;}
 th.folga-geral{color:#ED0000 !important;}
 
 .st-empty{color:#C7CFDA;}
 /* ===== cores das celulas diarias — alinhadas ao modelo GPA (formatacao condicional da planilha origem) ===== */
-.mc-p{color:#4285F4; font-weight:800;}
-.mc-fj{color:#ED7D31; font-weight:800;}
-.mc-fi{color:#ED0000; font-weight:800;}
-.mc-folga{color:#000; font-weight:800;}
-.mc-fer{color:#9900FF; font-weight:800;}
-.mc-ferias{color:#548235; font-weight:800;}
-.mc-d{color:#F1C232; font-weight:800;}
-.mc-at{color:#ED0000; font-weight:800;}
-.mc-int{color:#065F46; font-weight:800;}
+.mc-p{color:#4285F4;}
+.mc-fj{color:#ED7D31;}
+.mc-fi{color:#ED0000;}
+.mc-folga{color:#000;}
+.mc-fer{color:#9900FF;}
+.mc-ferias{color:#548235;}
+.mc-d{color:#F1C232;}
+.mc-at{color:#ED0000;}
+.mc-int{color:#065F46;}
 .he-mark{position:relative;}
 .he-mark::after{content:''; position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:50%; background:#9900FF;}
 
@@ -324,7 +329,7 @@ table.tgrade-uni tbody tr.oper-total-row td.stcol{text-align:right; font-weight:
    GRÁFICOS
    ============================================================ */
 .charts-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(440px,1fr)); gap:16px;}
-.ch, .ch-donut, .ch-hbar{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,27,45,.05);}
+.ch, .ch-donut, .ch-hbar{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,27,45,.05);}
 .ch h3, .ch-donut h3, .ch-hbar h3{font-size:12.5px; font-weight:700; margin:0 0 10px; color:var(--tx-primary);}
 .ch-canvas-wrap{position:relative; height:280px;}
 .ch-donut .ch-canvas-wrap{height:240px;}
@@ -336,7 +341,7 @@ table.tgrade-uni tbody tr.oper-total-row td.stcol{text-align:right; font-weight:
 .table-wrap{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(15,27,45,.05);}
 .table-scroll{overflow-x:auto;}
 table.std-table{width:100%; min-width:640px; border-collapse:collapse; font-size:12px;}
-table.std-table thead th{background:var(--sb-bg); color:#fff; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:10px 12px; text-align:left; white-space:nowrap;}
+table.std-table thead th{background:var(--indigo); color:#fff; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:10px 12px; text-align:left; white-space:nowrap;}
 table.std-table tbody td{padding:9px 12px; border-bottom:1px solid var(--border-light); color:var(--tx-primary);}
 table.std-table tbody tr:hover{background:#F7FAFD;}
 table.std-table tbody tr:last-child td{border-bottom:none;}
@@ -677,7 +682,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx-primary);font-s
 
 
 /* ── KPI GRID ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin-bottom:4px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px;margin-bottom:4px}
 .kpi{background:var(--card);border-radius:8px;padding:15px 16px;
   border:1px solid var(--border-light);border-left:4px solid var(--blue);
   box-shadow:0 1px 3px rgba(15,27,45,.06);transition:box-shadow .2s,transform .15s;cursor:default}
@@ -754,7 +759,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx-primary);font-s
 
 
 
-.tbl-scroll{overflow:auto;max-height:460px;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+.tbl-scroll{overflow:auto;max-height:clamp(380px, 60vh, 620px);-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+/* Peças que faltavam para a arquitetura de "duas tabelas sincronizadas"
+   documentada no comentário grande abaixo (.grade-freeze-wrap) ficar
+   completa: o CSS de .tgrade/.th-wrap/.gt-tot já existia neste arquivo,
+   copiado do modelo de referência, mas .grade-freeze-wrap/.grade-split/
+   .grade-pane-frozen nunca chegaram a ser definidos — por isso a Grade
+   Diária continuava usando a tabela única antiga (position:sticky por
+   célula) na prática, apesar deste CSS "novo" já estar todo aqui, sem uso. */
+.grade-freeze-wrap{position:relative}
+.grade-split{display:flex;align-items:flex-start}
+.grade-pane-frozen{overflow:hidden;max-height:clamp(380px, 60vh, 620px);position:relative;
+  z-index:2;border-right:2px solid var(--indigo);box-shadow:3px 0 6px rgba(15,27,45,.12);flex-shrink:0}
+.tgrade-frozen th:nth-child(1) .th-wrap{justify-content:flex-start;text-align:left}
+.tr-res td.r-des{color:#F1C232!important}
+.tr-res td.r-tx{color:var(--indigo)!important;font-weight:800}
 
 
 
@@ -805,7 +824,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx-primary);font-s
   box-sizing:border-box;overflow:hidden;padding:7px 8px;line-height:14px;white-space:nowrap;text-align:center}
 
 .tgrade td{padding:5px 7px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--border-light);
-  border-right:1px solid var(--border-light);white-space:nowrap;font-size:11.5px;line-height:15px}
+  border-right:1px solid var(--border-light);white-space:nowrap;font-size:11.5px;line-height:15px;
+  overflow:hidden;text-overflow:ellipsis;max-width:0}
+/* max-width:0 acima forca table-layout:fixed a respeitar a largura da coluna
+   (definida no colgroup) como um teto real para o texto, em vez de deixar
+   nomes/cargos longos vazarem visualmente por cima da celula vizinha —
+   sem depender de truncar o texto manualmente no JS. */
+.tgrade-frozen td:first-child{text-align:left}
 
 /* Larguras/alinhamento valem para th E td — mas a COR é definida só para td
    logo abaixo. Antes as duas regras vinham juntas e a cor (indigo/muted/blue)
@@ -1179,7 +1204,12 @@ img,svg{max-width:100%}
         <div class="sec-head"><span class="sec-title">Dimensionamento</span><div class="sec-line"></div></div>
         <p class="section-sub">Quadro solicitado × contratado por Unidade e Cargo/Setor — quadro fixo para o período Julho–Agosto/2026 (não varia por mês).</p>
         <div class="kpi-grid" id="dimKpis"></div>
+        <div class="grade-legend" id="dimLegend" style="margin-top:10px;"></div>
         <div class="cards-grid" id="dimCards" style="margin-top:16px;"></div>
+        <div class="tbl-card" style="margin-top:16px; padding:16px;">
+          <h3 style="font-size:13px;font-weight:800;margin:0 0 12px;color:var(--tx-primary);">Detalhe por Cargo</h3>
+          <div id="dimTable"></div>
+        </div>
       </section>
 
       <!-- ================= PRESENÇA DIÁRIA OPERACIONAL ================= -->
@@ -1238,6 +1268,7 @@ img,svg{max-width:100%}
         <p class="section-sub" id="heSub">Apurado a partir do registro de hora extra de cada colaborador (adicional 50% e 100%).</p>
         <div class="kpi-grid" id="heKpis"></div>
         <div id="heTabela" style="margin:16px 0;"></div>
+        <div id="heDetalhe" class="tbl-card" style="margin:16px 0; padding:16px;"></div>
         <div class="charts-grid" id="heCharts"></div>
       </section>
 
@@ -1369,6 +1400,7 @@ async function loadDashboardData(){
     // rotina COMPLETA de carga -- roda de novo em toda atualização (inicial E
     // realtime), nunca um re-render parcial (seção 2.6 do prompt).
     preprocess();
+    if(!_liveLoadedOnce && MESES.length){ state.mes = MESES[MESES.length-1]; }
     initFilters();
     renderAll();
 
@@ -1443,7 +1475,7 @@ function decimalToHHMM(dec){
   if(!isFinite(dec) || dec<0) dec=0;
   const totalMin = Math.round(dec*60);
   const h = Math.floor(totalMin/60), m = totalMin%60;
-  return `${h}:${String(m).padStart(2,'0')}`;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 function hoursToHHMM(dec){ return decimalToHHMM(dec); }
 function fmtNum(n){ return Number.isInteger(n) ? n.toLocaleString('pt-BR') : n.toLocaleString('pt-BR',{maximumFractionDigits:1}); }
@@ -1529,6 +1561,16 @@ function renderChartSafe(cardCanvasId, label, fn){
   }
 }
 const charts = {};
+if(typeof Chart!=='undefined'){
+  Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+  Chart.defaults.color = '#5C6B7E';
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.boxWidth = 12;
+  Chart.defaults.plugins.legend.labels.color = '#4B5768';
+  Chart.defaults.plugins.tooltip.bodyFont = {family:'Inter, system-ui, sans-serif'};
+  Chart.defaults.scale.grid.color = '#EEF1F5';
+  Chart.defaults.scale.ticks.color = '#5C6B7E';
+}
 
 /* ============================================================
    3. PALETA DE CORES POR SETOR / CARGO
@@ -1784,8 +1826,8 @@ function dimPctAndBadge(sol, con){
   let cls;
   if(sol<=0 && con>0) cls='dim-pct-exc';
   else if(pct>100) cls='dim-pct-exc';
-  else if(pct>=95) cls='dim-pct-ok';
-  else if(pct>=80) cls='dim-pct-warn';
+  else if(pct>=80) cls='dim-pct-ok';
+  else if(pct>=60) cls='dim-pct-warn';
   else cls='dim-pct-crit';
   return {pct, cls};
 }
@@ -1794,7 +1836,7 @@ function dimGapBadge(sol, con){
   if(sol<=0 && con>0) return {cls:'dim-gap-exc', label:`Excedente +${con}`};
   if(gap<0) return {cls:'dim-gap-exc', label:`Excedente +${-gap}`};
   if(gap===0) return {cls:'dim-gap-ok', label:'Atendido'};
-  const thresholdWarn = Math.max(1, Math.ceil(sol*0.2));
+  const thresholdWarn = Math.max(1, Math.ceil(sol*0.25));
   if(gap<=thresholdWarn) return {cls:'dim-gap-warn', label:`GAP: ${gap}`};
   return {cls:'dim-gap-crit', label:`GAP: ${gap}`};
 }
@@ -1922,6 +1964,39 @@ function renderDimensionamento(){
   if(!state.unidade) cardsData.sort((a,b)=>a.pct-b.pct);
 
   cardsEl.innerHTML = cardsData.map(cd=>renderDimUnitCard(cd, dimCargoData, effectiveVals)).join('');
+
+  const dimLegendEl = document.getElementById('dimLegend');
+  if(dimLegendEl){
+    dimLegendEl.innerHTML = `
+      <div class="legend-item"><span class="legend-swatch" style="background:#0E7A43"></span>Atendido (GAP = 0)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#B45309"></span>GAP moderado</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#C0281C"></span>GAP crítico</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#0079C2"></span>Excedente (contratado &gt; solicitado)</div>
+    `;
+  }
+  const dimTableEl = document.getElementById('dimTable');
+  if(dimTableEl){
+    const detRows = dimData.map(d=>{
+      const v = effectiveVals(d.cargo);
+      const gap = v.solicitado - v.contratado;
+      const pctR = v.solicitado>0 ? (v.contratado/v.solicitado*100) : 100;
+      const badge = dimGapBadge(v.solicitado, v.contratado);
+      return {unidade:d.unidade, cargo:d.cargo, sol:v.solicitado, con:v.contratado, gap, pctR, badge};
+    }).sort((a,b)=> a.unidade.localeCompare(b.unidade,'pt-BR') || a.cargo.localeCompare(b.cargo,'pt-BR'));
+    const detTrs = detRows.map(r=>`<tr>
+      <td>${esc(r.unidade)}</td><td>${esc(r.cargo)}</td>
+      <td>${fmtNum(r.sol)}</td><td>${fmtNum(r.con)}</td>
+      <td style="font-weight:700;color:${r.gap>0?'#C0281C':r.gap<0?'#0079C2':'#0E7A43'}">${r.gap>0?fmtNum(r.gap):(r.gap<0?'+'+fmtNum(-r.gap):'0')}</td>
+      <td>${fmtPct(r.pctR)}</td>
+      <td><span class="dim-card-gap-badge ${r.badge.cls}">${esc(r.badge.label)}</span></td>
+    </tr>`).join('');
+    dimTableEl.innerHTML = detRows.length ? `
+      <div class="table-wrap"><div class="table-scroll">
+      <table class="std-table">
+        <thead><tr><th>Unidade Operacional</th><th>Cargo</th><th>Solicitado</th><th>Contratado</th><th>GAP</th><th>% Realizado</th><th>Situação</th></tr></thead>
+        <tbody>${detTrs}</tbody>
+      </table></div></div>` : '';
+  }
 }
 
 /* ============================================================
@@ -2050,29 +2125,30 @@ function renderGradeRH(){
 
   const totalSubW = GRADE_COLW.colab + GRADE_COLW.unidade + GRADE_COLW.cargo + GRADE_COLW.turno;
   const N_TOT_COLS = 7; // Presenças, Faltas Just., Faltas Injust., Folgas, HE 50%, HE 100%, HE Total
-  let colgroup = `<colgroup><col style="width:${totalSubW}px">`;
-  days.forEach(()=> colgroup += `<col style="width:30px">`);
-  for(let i=0;i<N_TOT_COLS;i++) colgroup += `<col style="width:74px">`;
-  colgroup += `</colgroup>`;
 
-  /* Largura minima da area visivel da Grade Diaria: soma da coluna fixa da
-     esquerda (Colaborador/Unidade/Cargo/Turno) + as 7 colunas de total fixas
-     na direita + uma folga minima para pelo menos alguns dias ficarem
-     visiveis ao mesmo tempo. Sem isso, em telas menores o bloco fixo da
-     esquerda e o da direita podem se sobrepor (texto embaralhado) quando o
-     container encolhe mais do que a soma dos dois — nesse caso preferimos
-     que a PAGINA precise rolar um pouco na horizontal a mostrar texto
-     ilegivel sobreposto. */
-  const GRADE_MIN_VISIBLE_DAYS_PX = 240;
-  const gradeMinWidth = totalSubW + (74*7) + GRADE_MIN_VISIBLE_DAYS_PX;
+  /* ===== Grade em DUAS tabelas sincronizadas (painel congelado + painel
+     rolável) — mesma arquitetura "freeze panes" do modelo de referência,
+     substituindo definitivamente a tabela única com position:sticky por
+     célula nas 4 primeiras colunas. Essa abordagem antiga se mostrava
+     frágil: bastava a largura real renderizada divergir minimamente da
+     largura assumida pelos offsets left/right fixos (zoom do navegador,
+     nomes/cargos mais longos, diferenças de motor de renderização) para
+     reabrir um vão em branco ou sobrepor as colunas fixas — o mesmo bug
+     relatado repetidas vezes apesar de cada correção isolada de largura
+     estar matematicamente certa. Com duas tabelas, o painel congelado
+     (Colaborador/Unidade/Cargo/Turno) é uma tabela própria que NUNCA rola
+     horizontalmente — não existe mais nenhum offset left/right fixo para
+     dessincronizar. A rolagem vertical das duas tabelas é sincronizada via
+     JS (initGradeScrollSync). O cabeçalho de cada tabela usa
+     position:sticky;top:0 sozinho (um único eixo, sem left/right). */
+  const colgroupF = `<col style="width:${GRADE_COLW.colab}px"><col style="width:${GRADE_COLW.unidade}px">`
+    + `<col style="width:${GRADE_COLW.cargo}px"><col style="width:${GRADE_COLW.turno}px">`;
+  let colgroupS = '';
+  days.forEach(()=> colgroupS += `<col style="width:30px">`);
+  for(let i=0;i<N_TOT_COLS;i++) colgroupS += `<col style="width:74px">`;
 
   const extraCSS = `<style>
-    #gradeRH{min-width:${gradeMinWidth}px;}
-    #gradeRH .stc-flex{width:${totalSubW}px;}
-    #gradeRH .stc-flex>div:nth-child(1){flex:0 0 ${GRADE_COLW.colab}px;}
-    #gradeRH .stc-flex>div:nth-child(2){flex:0 0 ${GRADE_COLW.unidade}px;}
-    #gradeRH .stc-flex>div:nth-child(3){flex:0 0 ${GRADE_COLW.cargo}px;}
-    #gradeRH .stc-flex>div:nth-child(4){flex:0 0 ${GRADE_COLW.turno}px;}
+    #grade-pane-frozen, #grade-table-frozen{width:${totalSubW}px;}
   </style>`;
 
   const allVisibleColabs = [];
@@ -2089,23 +2165,30 @@ function renderGradeRH(){
     if(!algumP) folgaGeralSet.add(iso);
   });
 
-  let thead = '<thead><tr>';
-  thead += `<th class="stcol"><div class="stc-flex"><div>Colaborador</div><div>Unidade</div><div>Cargo</div><div>Turno</div></div></th>`;
+  const headF = `<tr><th><div class="th-wrap">Colaborador</div></th><th><div class="th-wrap">Unidade</div></th>`
+    + `<th><div class="th-wrap">Cargo</div></th><th><div class="th-wrap">Turno</div></th></tr>`;
+
+  let headDays = '';
   days.forEach(iso=>{
     const wknd = isWeekend(iso) ? ' col-weekend-head' : '';
     const fg = folgaGeralSet.has(iso) ? ' folga-geral' : '';
-    thead += `<th class="${wknd}${fg}">${fmtDateShort(iso)}<br>${weekdayAbbrev(iso)}</th>`;
+    headDays += `<th class="${wknd}${fg}"><div class="th-wrap">${fmtDateShort(iso)}<br>${weekdayAbbrev(iso)}</div></th>`;
   });
-  thead += `<th class="tot-head gt-tot gtc-p" title="Total de Presenças no Mês">Total<br>Presenças</th>`
-    + `<th class="tot-head gt-tot gtc-fj" title="Total de Faltas Justificadas no Mês">Total<br>Faltas Just.</th>`
-    + `<th class="tot-head gt-tot gtc-fi" title="Total de Faltas Injustificadas no Mês">Total<br>Faltas Injust.</th>`
-    + `<th class="tot-head gt-tot gtc-flg" title="Total de Folgas no Mês">Total<br>Folgas</th>`
-    + `<th class="tot-head gt-tot gtc-he5" title="Total de Horas Extras a 50% no Mês">Total<br>HE 50%</th>`
-    + `<th class="tot-head gt-tot gtc-he1" title="Total de Horas Extras a 100% no Mês">Total<br>HE 100%</th>`
-    + `<th class="tot-head gt-tot" title="Horas Extras Totais no Mês">Total<br>HE Total</th>`;
-  thead += '</tr></thead>';
+  const totHeaders = [
+    {cls:'gt-tot gtc-p',   title:'Total de Presenças no Mês',             main:'Presenças'},
+    {cls:'gt-tot gtc-fj',  title:'Total de Faltas Justificadas no Mês',   main:'Faltas Just.'},
+    {cls:'gt-tot gtc-fi',  title:'Total de Faltas Injustificadas no Mês', main:'Faltas Injust.'},
+    {cls:'gt-tot gtc-flg', title:'Total de Folgas no Mês',                main:'Folgas'},
+    {cls:'gt-tot gtc-he5', title:'Total de Horas Extras a 50% no Mês',    main:'HE 50%'},
+    {cls:'gt-tot gtc-he1', title:'Total de Horas Extras a 100% no Mês',   main:'HE 100%'},
+    {cls:'gt-tot',         title:'Horas Extras Totais no Mês',            main:'HE Total'},
+  ];
+  const headTot = totHeaders.map(h=>`<th class="${h.cls}" title="${h.title}"><div class="th-wrap"><span class="gtw-main">${h.main}</span><span class="gtw-sub">no mês</span></div></th>`).join('');
+  const headS = `<tr>${headDays}${headTot}</tr>`;
 
-  let tbody = '<tbody>';
+  let rowsF = '', rowsS = '';
+  const totalColsS = days.length + N_TOT_COLS;
+
   groups.forEach(g=>{
     const colabs = g.colaboradores.filter(c=>{
       if(state.cargo && c.cargo!==state.cargo) return false;
@@ -2113,7 +2196,12 @@ function renderGradeRH(){
     });
     if(colabs.length===0) return;
 
-    tbody += `<tr class="grp-header"><td class="stcol">${esc(g.unidade)} — ${esc(g.turno)}</td><td colspan="${days.length+N_TOT_COLS}"></td></tr>`;
+    rowsF += `<tr class="tgroup-header"><td colspan="4">${esc(g.unidade)} — ${esc(g.turno)}</td></tr>`;
+    // &nbsp; (não célula vazia): um <td></td> sem conteúdo não reserva a
+    // mesma altura de linha que o <td> com texto do painel congelado — isso
+    // desalinharia as duas tabelas a partir daqui (ver comentário de design
+    // em .grade-pane-frozen no CSS).
+    rowsS += `<tr class="tgroup-header"><td colspan="${totalColsS}">&nbsp;</td></tr>`;
 
     const resumoDefs = [
       {code:'FER', label:'Feriado', cls:'r-fer'},
@@ -2138,7 +2226,7 @@ function renderGradeRH(){
           if(st===def.code) cnt++;
         });
         rowTot += cnt;
-        cells += `<td>${cnt||''}</td>`;
+        cells += `<td class="${def.cls}">${cnt||''}</td>`;
       });
       // colunas de HE nao se aplicam as linhas de resumo por status — ficam
       // sempre "—", igual as demais categorias que nao batem com a linha atual.
@@ -2149,7 +2237,8 @@ function renderGradeRH(){
       else if(def.code==='FI') totCells = `<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot${rowTot>0?' gtv-fi':''}">${rowTot||'—'}</td><td class="gt-tot">—</td>${heBlank}`;
       else if(def.code==='FOLGA') totCells = `<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot${rowTot>0?' gtv-flg':''}">${rowTot||'—'}</td>${heBlank}`;
       else totCells = `<td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td><td class="gt-tot">—</td>${heBlank}`;
-      tbody += `<tr class="tr-res-label ${def.cls}"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">${esc(def.label)}</div></div></td>${cells}${totCells}</tr>`;
+      rowsF += `<tr class="tr-res"><td colspan="4" class="${def.cls}" style="text-align:right;padding-right:8px">${esc(def.label)}</td></tr>`;
+      rowsS += `<tr class="tr-res">${cells}${totCells}</tr>`;
     });
 
     let pctCells = '';
@@ -2164,13 +2253,13 @@ function renderGradeRH(){
       });
       const hasAny = (c.P+c.FJ+c.FI+c.AT)>0;
       const pct = pctPresencaFromCounts(c);
-      pctCells += hasAny ? `<td>${pct.toFixed(1)}%</td>` : '<td class="st-empty">·</td>';
+      pctCells += hasAny ? `<td class="r-tx">${pct.toFixed(1)}%</td>` : '<td class="st-empty">·</td>';
     });
     const pctTotPlaceholders = Array(7).fill('<td class="gt-tot" style="background:var(--indigo) !important"></td>').join('');
-    tbody += `<tr class="tr-res-label r-pct"><td class="stcol"><div class="stc-flex" style="justify-content:flex-end;padding-right:10px"><div style="flex:1;text-align:right">% de Presença</div></div></td>${pctCells}${pctTotPlaceholders}</tr>`;
+    rowsF += `<tr class="tr-res"><td colspan="4" style="text-align:right;padding-right:8px;background:var(--indigo) !important;color:#fff !important">% de Presença</td></tr>`;
+    rowsS += `<tr class="tr-res">${pctCells}${pctTotPlaceholders}</tr>`;
 
     colabs.forEach(c=>{
-      const nomeShort = c.nome.length>16 ? c.nome.slice(0,16)+'…' : c.nome;
       let cells = '';
       let tP=0,tFJ=0,tFI=0,tFLG=0,tHE5=0,tHE1=0;
       days.forEach(iso=>{
@@ -2197,26 +2286,17 @@ function renderGradeRH(){
         }
       });
       const tHET = tHE5 + tHE1;
-      tbody += `<tr>
-        <td class="stcol"><div class="stc-flex">
-          <div class="colab-name" title="${esc(c.nome)}">${esc(nomeShort)}</div>
-          <div class="unidade-cell">${esc(g.unidade)}</div>
-          <div class="cargo-cell" style="color:${cargoColor(c.cargo)}">${esc(c.cargo)}</div>
-          <div class="turno-cell">${esc(g.turno)}</div>
-        </div></td>
-        ${cells}
-        <td class="gt-tot${tP>0?' gtv-p':''}">${tP||'—'}</td><td class="gt-tot${tFJ>0?' gtv-fj':''}">${tFJ||'—'}</td><td class="gt-tot${tFI>0?' gtv-fi':''}">${tFI||'—'}</td><td class="gt-tot${tFLG>0?' gtv-flg':''}">${tFLG||'—'}</td><td class="gt-tot${tHE5>0?' gtv-he5':''}">${tHE5>0?hoursToHHMM(tHE5):'—'}</td><td class="gt-tot${tHE1>0?' gtv-he1':''}">${tHE1>0?hoursToHHMM(tHE1):'—'}</td><td class="gt-tot${tHET>0?' gtv-het':''}">${tHET>0?hoursToHHMM(tHET):'—'}</td>
+      rowsF += `<tr>
+        <td title="${esc(c.nome)}">${esc(c.nome)}</td>
+        <td title="${esc(g.unidade)}">${esc(g.unidade)}</td>
+        <td title="${esc(c.cargo)}" style="color:${cargoColor(c.cargo)}">${esc(c.cargo)}</td>
+        <td title="${esc(g.turno)}">${esc(g.turno)}</td>
       </tr>`;
+      rowsS += `<tr>${cells}<td class="gt-tot${tP>0?' gtv-p':''}">${tP||'—'}</td><td class="gt-tot${tFJ>0?' gtv-fj':''}">${tFJ||'—'}</td><td class="gt-tot${tFI>0?' gtv-fi':''}">${tFI||'—'}</td><td class="gt-tot${tFLG>0?' gtv-flg':''}">${tFLG||'—'}</td><td class="gt-tot${tHE5>0?' gtv-he5':''}">${tHE5>0?hoursToHHMM(tHE5):'—'}</td><td class="gt-tot${tHE1>0?' gtv-he1':''}">${tHE1>0?hoursToHHMM(tHE1):'—'}</td><td class="gt-tot${tHET>0?' gtv-het':''}">${tHET>0?hoursToHHMM(tHET):'—'}</td></tr>`;
     });
   });
-  tbody += '</tbody>';
 
   container.innerHTML = extraCSS + `
-    <div class="table-scroll-controls">
-      <button class="arrow-btn" id="gradeArrowL">◀</button>
-      <button class="arrow-btn" id="gradeArrowR">▶</button>
-    </div>
-    <div class="uni-scroll" id="gradeRH"><table class="tgrade-uni">${colgroup}${thead}${tbody}</table></div>
     <div class="grade-legend">
       <div class="legend-item"><span class="legend-swatch" style="background:#4285F4"></span>P — Presença</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#ED7D31"></span>FJ — Falta Justificada</div>
@@ -2231,8 +2311,44 @@ function renderGradeRH(){
       <div class="legend-item"><span class="legend-dot"></span>Hora Extra (passe o mouse sobre a célula)</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#ED0000"></span>Folga Geral (ninguém trabalhou)</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#1A56DB"></span>Totais: Presenças / HE 50% (roxo) / HE 100% (vermelho) no mês</div>
+    </div>
+    <div class="table-scroll-controls">
+      <button class="arrow-btn" id="gradeArrowL">◀</button>
+      <button class="arrow-btn" id="gradeArrowR">▶</button>
+    </div>
+    <div class="grade-freeze-wrap">
+      <div class="grade-split">
+        <div class="grade-pane-frozen" id="grade-pane-frozen">
+          <table class="tgrade tgrade-frozen" id="grade-table-frozen">
+            <colgroup>${colgroupF}</colgroup>
+            <thead id="grade-head-frozen">${headF}</thead>
+            <tbody id="grade-body-frozen">${rowsF}</tbody>
+          </table>
+        </div>
+        <div class="tbl-scroll" id="grade-scroll-outer">
+          <table class="tgrade tgrade-scroll" id="grade-table">
+            <colgroup id="grade-colgroup">${colgroupS}</colgroup>
+            <thead id="grade-head">${headS}</thead>
+            <tbody id="grade-body">${rowsS}</tbody>
+          </table>
+        </div>
+      </div>
     </div>`;
-  wireArrowButtons('gradeArrowL','gradeArrowR','gradeRH');
+  wireArrowButtons('gradeArrowL','gradeArrowR','grade-scroll-outer');
+  initGradeScrollSync();
+}
+
+// Painel congelado (Colaborador/Unidade/Cargo/Turno) rola verticalmente em
+// espelho ao painel de dias — overflow:hidden + scrollTop via JS, técnica
+// padrão de "freeze panes" com duas tabelas (ver comentário em
+// .grade-pane-frozen no CSS). innerHTML é reconstruído a cada render, então
+// o listener antigo (se houver) já foi descartado junto com o DOM antigo —
+// seguro registrar de novo a cada chamada, sem acumular listeners.
+function initGradeScrollSync(){
+  const scrollPane = document.getElementById('grade-scroll-outer');
+  const frozenPane = document.getElementById('grade-pane-frozen');
+  if(!scrollPane || !frozenPane) return;
+  scrollPane.addEventListener('scroll', ()=>{ frozenPane.scrollTop = scrollPane.scrollTop; }, {passive:true});
 }
 
 /* ============================================================
@@ -2312,7 +2428,7 @@ function renderGraficos(){
     <div class="ch"><h3>Presenças × Faltas (FJ+FI) por Unidade</h3><div class="ch-canvas-wrap"><canvas id="chPresFaltas"></canvas></div></div>
     <div class="ch"><h3>% Presença por Turno</h3><div class="ch-canvas-wrap"><canvas id="chPresTurno"></canvas></div></div>
     <div class="ch-donut"><h3>Absenteísmo · Presença × Faltas</h3><div class="ch-canvas-wrap" style="position:relative"><canvas id="chAbsenteismo"></canvas><div class="donut-center-label" id="absenteismoDonutCenter"></div></div></div>
-    <div class="ch"><h3>% Presença por Setor</h3><div class="ch-canvas-wrap"><canvas id="chPresSetor"></canvas></div></div>
+    <div class="ch"><h3>% Presença por Cargo</h3><div class="ch-canvas-wrap" id="chPresSetor-wrap"><canvas id="chPresSetor"></canvas></div></div>
   `;
   function statsBy(dimFn){
     const buckets = {};
@@ -2390,20 +2506,26 @@ function renderGraficos(){
         plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{unit:'pct'}}}
     });
   });
-  renderChartSafe('chPresSetor','% Presença por Setor', ()=>{
+  renderChartSafe('chPresSetor','% Presença por Cargo', ()=>{
     const buckets = statsBy(r=>r.cargo);
-    const labels = CARGOS.filter(c=>buckets[c]);
-    const pcts = labels.map(l=>pctPresencaFromCounts(buckets[l]));
-    const media = pcts.length? +(pcts.reduce((a,b)=>a+b,0)/pcts.length).toFixed(1):0;
+    let labels = CARGOS.filter(c=>buckets[c]);
+    let pcts = labels.map(l=>pctPresencaFromCounts(buckets[l]));
+    const combined = labels.map((l,i)=>({l,p:pcts[i]})).sort((a,b)=>b.p-a.p);
+    labels = combined.map(x=>x.l);
+    pcts = combined.map(x=>x.p);
+    const fullLabels = labels.slice();
+    const shortLabels = labels.map(l=>l.length>28? l.slice(0,26)+'…' : l);
+    const wrap = document.getElementById('chPresSetor-wrap');
+    if(wrap) wrap.style.height = Math.min(420, Math.max(220, labels.length*26+50))+'px';
+    const barColor = p=> p>=95?'#0E7A43' : p>=85?'#B45309' : '#C0281C';
     destroyChart('presSetor');
     charts.presSetor = new Chart(document.getElementById('chPresSetor'), {
-      data:{labels, datasets:[
-        {type:'bar', label:'% Presença', data:pcts, backgroundColor:'#6B21A8'},
-        {type:'line', label:'Média Geral', data:labels.map(()=>media), borderColor:'#C0281C', borderWidth:1.5, pointRadius:0}
-      ]},
-      options:{responsive:true, maintainAspectRatio:false,
-        scales:{y:{beginAtZero:true, max:100, ticks:{callback:v=>v+'%'}}},
-        plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}, barValuePlugin:{unit:'pct'}}}
+      type:'bar',
+      data:{labels:shortLabels, datasets:[{label:'% Presença', data:pcts, backgroundColor:pcts.map(barColor), borderRadius:4, barPercentage:.72}]},
+      options:{indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        scales:{x:{beginAtZero:true, max:100, ticks:{callback:v=>v+'%'}}},
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{title:items=>fullLabels[items[0].dataIndex], label:ctx=>'% Presença: '+ctx.parsed.x+'%'}}}}
     });
   });
 }
@@ -2528,8 +2650,12 @@ function renderResumo(){
   });
   const trs = rows.map(r=>`<tr>
     <td>${esc(r.unidade)}</td><td>${esc(r.mes)}</td><td>${esc(r.turno)}</td>
-    <td>${fmtPct(r.pct)}</td><td>${fmtPct(r.absent)}</td>
-    <td>${fmtNum(r.P)}</td><td>${fmtNum(r.FJ)}</td><td>${fmtNum(r.FI)}</td><td>${fmtNum(r.faltas)}</td>
+    <td style="font-weight:700;color:${r.pct>=95?'#0E7A43':r.pct>=85?'#B45309':'#C0281C'}">${fmtPct(r.pct)}</td>
+    <td style="font-weight:700;color:${r.absent>=14?'#C0281C':r.absent>=8?'#B45309':'#0079C2'}">${fmtPct(r.absent)}</td>
+    <td style="font-weight:700;color:#0079C2">${fmtNum(r.P)}</td>
+    <td style="color:${r.FJ>0?'#B45309':'#5C6B7E'}">${r.FJ||'—'}</td>
+    <td style="color:${r.FI>0?'#C0281C':'#5C6B7E'}">${r.FI||'—'}</td>
+    <td style="color:${r.faltas>0?'#C0281C':'#5C6B7E'}">${r.faltas||'—'}</td>
     <td><span class="status-chip ${r.statusCls}">${r.statusLabel}</span></td>
   </tr>`).join('');
   el.innerHTML = rows.length ? `
@@ -2603,13 +2729,66 @@ function renderHE(){
     const media = nColab>0? tot/nColab:0;
     return {u, h50, h100, tot, nColab, media};
   }).sort((a,b)=>b.tot-a.tot);
-  const trs = tableRows.map(r=>`<tr><td>${esc(r.u)}</td><td>${hoursToHHMM(r.h50)}</td><td>${hoursToHHMM(r.h100)}</td><td><strong>${hoursToHHMM(r.tot)}</strong></td><td>${r.nColab}</td><td>${hoursToHHMM(r.media)}</td></tr>`).join('');
+  const trs = tableRows.map(r=>`<tr><td>${esc(r.u)}</td><td>${hoursToHHMM(r.h50)}</td><td>${hoursToHHMM(r.h100)}</td><td style="font-weight:800;color:var(--indigo)">${hoursToHHMM(r.tot)}</td><td>${r.nColab}</td><td>${hoursToHHMM(r.media)}</td></tr>`).join('');
   tabEl.innerHTML = tableRows.length ? `
     <div class="table-wrap"><div class="table-scroll">
     <table class="std-table">
       <thead><tr><th>Unidade</th><th>HE 50% (h)</th><th>HE 100% (h)</th><th>HE Total (h)</th><th>Colaboradores c/ HE</th><th>Média HE/Colaborador (h)</th></tr></thead>
       <tbody>${trs}</tbody>
     </table></div></div>` : noDataBlock('Nenhum registro de hora extra encontrado para a combinação de filtros ativa.');
+
+  const heDetEl = document.getElementById('heDetalhe');
+  if(heDetEl){
+    const byColab = {};
+    rows.forEach(r=>{
+      const key = r.colab+'|'+r.unidade+'|'+r.cargo+'|'+r.turno;
+      byColab[key] = byColab[key] || {colab:r.colab, unidade:r.unidade, cargo:r.cargo, turno:r.turno, ex50:0, ex100:0};
+      byColab[key].ex50 += r.ex50;
+      byColab[key].ex100 += r.ex100;
+    });
+    const allColabRows = Object.values(byColab).map(r=>Object.assign({}, r, {tot:r.ex50+r.ex100}));
+
+    function paintHEDetalhe(){
+      const buscaEl = document.getElementById('heBusca');
+      const sortEl = document.getElementById('heSortSelect');
+      const busca = normalize(buscaEl ? buscaEl.value : '');
+      const sortKey = sortEl ? sortEl.value : 'tot_desc';
+      let list = allColabRows.filter(r=> !busca || normalize(r.colab).includes(busca));
+      const sorters = {
+        tot_desc: (a,b)=>b.tot-a.tot, tot_asc:(a,b)=>a.tot-b.tot,
+        nome_asc: (a,b)=>a.colab.localeCompare(b.colab,'pt-BR'), nome_desc:(a,b)=>b.colab.localeCompare(a.colab,'pt-BR')
+      };
+      list = list.slice().sort(sorters[sortKey]||sorters.tot_desc);
+      const body = document.getElementById('heDetalheBody');
+      if(!body) return;
+      body.innerHTML = list.length ? list.map(r=>`<tr>
+          <td>${esc(r.colab)}</td><td>${esc(r.unidade)}</td><td>${esc(r.cargo)}</td><td>${esc(r.turno)}</td>
+          <td>${hoursToHHMM(r.ex50)}</td><td>${hoursToHHMM(r.ex100)}</td>
+          <td style="font-weight:800;color:var(--indigo)">${hoursToHHMM(r.tot)}</td>
+        </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--tx-secondary)">Nenhum colaborador encontrado.</td></tr>';
+    }
+
+    heDetEl.innerHTML = `
+      <h3 style="font-size:13px;font-weight:800;margin:0 0 10px;color:var(--tx-primary);">Detalhamento por Colaborador</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <input type="text" id="heBusca" placeholder="Buscar colaborador..." style="border:1.5px solid var(--border); border-radius:6px; padding:7px 11px; font-size:13px; font-family:var(--font); min-width:220px;">
+        <select id="heSortSelect" style="border:1.5px solid var(--border); border-radius:6px; padding:7px 11px; font-size:13px; font-family:var(--font);">
+          <option value="tot_desc">Total HE (maior primeiro)</option>
+          <option value="tot_asc">Total HE (menor primeiro)</option>
+          <option value="nome_asc">Nome (A–Z)</option>
+          <option value="nome_desc">Nome (Z–A)</option>
+        </select>
+      </div>
+      <div class="table-wrap"><div class="table-scroll">
+      <table class="std-table">
+        <thead><tr><th>Colaborador</th><th>Unidade</th><th>Cargo</th><th>Turno</th><th>HE 50% (h)</th><th>HE 100% (h)</th><th>Total (h)</th></tr></thead>
+        <tbody id="heDetalheBody"></tbody>
+      </table></div></div>
+    `;
+    document.getElementById('heBusca').addEventListener('input', paintHEDetalhe);
+    document.getElementById('heSortSelect').addEventListener('change', paintHEDetalhe);
+    paintHEDetalhe();
+  }
 
   chEl.innerHTML = `
     <div class="ch-donut"><h3>Composição HE 50% × 100%</h3><div class="ch-canvas-wrap" style="position:relative"><canvas id="chHEDonut"></canvas><div class="donut-center-label" id="heDonutCenter"></div></div></div>
@@ -2621,13 +2800,15 @@ function renderHE(){
 
   renderChartSafe('chHEDonut','Composição HE', ()=>{
     const h50 = rows.reduce((s,r)=>s+r.ex50,0), h100 = rows.reduce((s,r)=>s+r.ex100,0);
+    const totalHE = h50+h100;
     destroyChart('heDonut');
     charts.heDonut = new Chart(document.getElementById('chHEDonut'), {
       type:'doughnut',
-      data:{labels:['HE 50%','HE 100%'], datasets:[{data:[h50,h100], backgroundColor:['#0079C2','#6B21A8'], borderWidth:0}]},
-      options:{responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}}
+      data:{labels:['HE 50%','HE 100%'], datasets:[{data:[h50,h100], backgroundColor:['#0079C2','#C0281C'], borderWidth:2, borderColor:'#fff', hoverOffset:6}]},
+      options:{responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}},
+        tooltip:{callbacks:{label:ctx=>{ const pct = totalHE>0 ? (ctx.parsed/totalHE*100).toFixed(1) : '0.0'; return `${ctx.label}: ${hoursToHHMM(ctx.parsed)}h (${pct}%)`; }}}}}
     });
-    document.getElementById('heDonutCenter').innerHTML = `<span class="v">${hoursToHHMM(h50+h100)}h</span><span class="l">Total</span>`;
+    document.getElementById('heDonutCenter').innerHTML = `<span class="v">${hoursToHHMM(totalHE)}h</span><span class="l">Total</span>`;
   });
   renderChartSafe('chHEEvol','Evolução Mensal HE', ()=>{
     const meses = MESES;
@@ -2648,14 +2829,20 @@ function renderHE(){
       const d50 = labels.map(l=> rows.filter(r=>dimFn(r)===l).reduce((s,r)=>s+r.ex50,0));
       const d100 = labels.map(l=> rows.filter(r=>dimFn(r)===l).reduce((s,r)=>s+r.ex100,0));
       destroyChart(key);
+      const avg50 = labels.map(l=>{ const rs=rows.filter(r=>dimFn(r)===l); const n=new Set(rs.map(r=>r.colab)).size; return n>0? rs.reduce((s,r)=>s+r.ex50,0)/n : 0; });
+      const avg100 = labels.map(l=>{ const rs=rows.filter(r=>dimFn(r)===l); const n=new Set(rs.map(r=>r.colab)).size; return n>0? rs.reduce((s,r)=>s+r.ex100,0)/n : 0; });
       charts[key] = new Chart(document.getElementById(canvasId), {
         data:{labels, datasets:[
-          {type:'bar', label:'HE 50%', data:d50, backgroundColor:'#0079C2'},
-          {type:'bar', label:'HE 100%', data:d100, backgroundColor:'#6B21A8'},
+          {type:'bar', label:'HE 50%', data:d50, avgData:avg50, backgroundColor:'#0079C2', stack:'he', borderRadius:4},
+          {type:'bar', label:'HE 100%', data:d100, avgData:avg100, backgroundColor:'#C0281C', stack:'he', borderRadius:4},
         ]},
         options:{responsive:true, maintainAspectRatio:false,
           scales:{x:{stacked:true}, y:{stacked:true, beginAtZero:true}},
-          plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}, barValuePlugin:{unit:'h'}}}
+          plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}, barValuePlugin:{unit:'h'},
+            tooltip:{callbacks:{
+              label:ctx=>{ const avg = ctx.dataset.avgData ? ctx.dataset.avgData[ctx.dataIndex] : null; const base = ctx.dataset.label+': '+hoursToHHMM(ctx.parsed.y)+'h'; return avg ? base+' · méd. '+hoursToHHMM(avg)+'h/colab' : base; },
+              footer:items=>'Total: '+hoursToHHMM(items.reduce((a,i)=>a+i.parsed.y,0))+'h'
+            }}}}
       });
     });
   }
