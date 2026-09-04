@@ -329,9 +329,9 @@ table.tgrade-uni tbody tr.oper-total-row td.stcol{text-align:right; font-weight:
    GRÁFICOS
    ============================================================ */
 .charts-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(440px,1fr)); gap:16px; min-width:0;}
-.ch, .ch-donut, .ch-hbar{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,27,45,.05);}
+.ch, .ch-donut, .ch-hbar{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,27,45,.05); overflow:hidden;}
 .ch h3, .ch-donut h3, .ch-hbar h3{font-size:12.5px; font-weight:700; margin:0 0 10px; color:var(--tx-primary);}
-.ch-canvas-wrap{position:relative; height:280px; min-width:0;}
+.ch-canvas-wrap{position:relative; height:280px; min-width:0; overflow:hidden;}
 .ch-donut .ch-canvas-wrap{height:240px;}
 .chart-fallback-msg{padding:40px 10px; text-align:center; color:var(--tx-secondary); font-size:12px; font-weight:600;}
 
@@ -351,6 +351,12 @@ table.std-table tbody tr:last-child td{border-bottom:none;}
 .status-chip.crit{background:var(--red-bg); color:var(--red);}
 .dim-adm{color:var(--green); font-weight:700;}
 .dim-des{color:var(--red); font-weight:700;}
+/* Movimentações · Admissões e Desligamentos -- cabeçalho com o mesmo
+   tratamento de cor "de atenção" (vermelho suave) usado pelo modelo para
+   tabelas de movimentação de pessoal, em vez do azul genérico das demais
+   tabelas do dashboard. */
+table.std-table.movim-table thead th{background:var(--red-bg); color:var(--red);}
+table.std-table.movim-table tbody tr:hover{background:#FFF7ED;}
 
 /* Hora Extra donut / stacked específicos */
 .donut-center-label{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none;}
@@ -1249,7 +1255,7 @@ img,svg{max-width:100%}
         <div class="sec-head"><span class="sec-title">Evolução</span><div class="sec-line"></div></div>
         <p class="section-sub">Tendência dia a dia e mês a mês de presença, faltas e absenteísmo.</p>
         <div class="charts-grid" id="evolucaoCharts" style="margin-bottom:16px;"></div>
-        <div id="evolucaoTabela"></div>
+        <div id="evolucaoTabela" style="margin-top:8px;"></div>
       </section>
 
       <!-- ================= MOVIMENTAÇÕES ================= -->
@@ -2621,7 +2627,7 @@ function renderMovimentacoes(){
   }).join('');
   el.innerHTML = `
     <div class="table-wrap"><div class="table-scroll">
-    <table class="std-table">
+    <table class="std-table movim-table">
       <thead><tr><th>Unidade Operacional</th><th>Mês</th><th>Colaborador Admitido</th><th>Data de Admissão</th><th>Colaborador Demitido</th><th>Data de Demissão</th></tr></thead>
       <tbody>${trs || '<tr><td colspan="6" style="text-align:center;color:var(--tx-secondary)">Nenhum evento no período filtrado.</td></tr>'}</tbody>
     </table></div></div>`;
