@@ -283,6 +283,20 @@ table.tgrade-uni tbody tr.tr-res-label td.gt-tot{background:#FAFBFD !important; 
 table.tgrade-uni tbody tr.grp-header td.gt-tot{background:var(--indigo) !important;}
 table.tgrade-uni thead th.tot-head{white-space:normal; line-height:1.25; font-size:9px;}
 
+/* ===== totais fixos (sticky) na borda direita — ficam sempre visiveis sem
+   precisar rolar a Grade Diaria ate o fim; colgroup ja define 74px por
+   coluna de total (N_TOT_COLS=7), entao os offsets abaixo sao multiplos
+   exatos disso, empilhando as 7 colunas da direita para a esquerda ===== */
+table.tgrade-uni th.gt-tot, table.tgrade-uni td.gt-tot{position:sticky; z-index:3;}
+table.tgrade-uni thead th.gt-tot{z-index:7;}
+table.tgrade-uni th.gt-tot:nth-last-child(1), table.tgrade-uni td.gt-tot:nth-last-child(1){right:0;}
+table.tgrade-uni th.gt-tot:nth-last-child(2), table.tgrade-uni td.gt-tot:nth-last-child(2){right:74px;}
+table.tgrade-uni th.gt-tot:nth-last-child(3), table.tgrade-uni td.gt-tot:nth-last-child(3){right:148px;}
+table.tgrade-uni th.gt-tot:nth-last-child(4), table.tgrade-uni td.gt-tot:nth-last-child(4){right:222px;}
+table.tgrade-uni th.gt-tot:nth-last-child(5), table.tgrade-uni td.gt-tot:nth-last-child(5){right:296px;}
+table.tgrade-uni th.gt-tot:nth-last-child(6), table.tgrade-uni td.gt-tot:nth-last-child(6){right:370px;}
+table.tgrade-uni th.gt-tot:nth-last-child(7), table.tgrade-uni td.gt-tot:nth-last-child(7){right:444px; box-shadow:-2px 0 4px rgba(0,0,0,.08);}
+
 .grade-legend{display:flex; flex-wrap:wrap; gap:14px; padding:10px 4px; font-size:11px; color:var(--tx-secondary); font-weight:600;}
 .legend-item{display:flex; align-items:center; gap:6px;}
 .legend-swatch{width:11px; height:11px; border-radius:3px; flex-shrink:0; display:inline-block;}
