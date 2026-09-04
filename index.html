@@ -2046,7 +2046,19 @@ function renderGradeRH(){
   for(let i=0;i<N_TOT_COLS;i++) colgroup += `<col style="width:74px">`;
   colgroup += `</colgroup>`;
 
+  /* Largura minima da area visivel da Grade Diaria: soma da coluna fixa da
+     esquerda (Colaborador/Unidade/Cargo/Turno) + as 7 colunas de total fixas
+     na direita + uma folga minima para pelo menos alguns dias ficarem
+     visiveis ao mesmo tempo. Sem isso, em telas menores o bloco fixo da
+     esquerda e o da direita podem se sobrepor (texto embaralhado) quando o
+     container encolhe mais do que a soma dos dois — nesse caso preferimos
+     que a PAGINA precise rolar um pouco na horizontal a mostrar texto
+     ilegivel sobreposto. */
+  const GRADE_MIN_VISIBLE_DAYS_PX = 240;
+  const gradeMinWidth = totalSubW + (74*7) + GRADE_MIN_VISIBLE_DAYS_PX;
+
   const extraCSS = `<style>
+    #gradeRH{min-width:${gradeMinWidth}px;}
     #gradeRH .stc-flex{width:${totalSubW}px;}
     #gradeRH .stc-flex>div:nth-child(1){flex:0 0 ${GRADE_COLW.colab}px;}
     #gradeRH .stc-flex>div:nth-child(2){flex:0 0 ${GRADE_COLW.unidade}px;}
