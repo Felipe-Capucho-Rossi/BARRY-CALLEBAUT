@@ -349,14 +349,11 @@ table.std-table tbody tr:last-child td{border-bottom:none;}
 .status-chip.ok{background:var(--green-bg); color:var(--green);}
 .status-chip.warn{background:var(--amber-bg); color:var(--amber);}
 .status-chip.crit{background:var(--red-bg); color:var(--red);}
-.dim-adm{color:var(--green); font-weight:700;}
-.dim-des{color:var(--red); font-weight:700;}
-/* Movimentações · Admissões e Desligamentos -- cabeçalho com o mesmo
-   tratamento de cor "de atenção" (vermelho suave) usado pelo modelo para
-   tabelas de movimentação de pessoal, em vez do azul genérico das demais
-   tabelas do dashboard. */
-table.std-table.movim-table thead th{background:var(--red-bg); color:var(--red);}
-table.std-table.movim-table tbody tr:hover{background:#FFF7ED;}
+/* Movimentações · Admissões e Desligamentos -- cabeçalho azul/branco (igual
+   às demais tabelas) e nomes em badge: admitido = azul com preenchimento
+   azul claro, demitido = vermelho com preenchimento vermelho claro. */
+.dim-adm{display:inline-block; color:var(--blue); background:var(--blue-light); font-weight:700; padding:3px 9px; border-radius:6px;}
+.dim-des{display:inline-block; color:var(--red); background:var(--red-bg); font-weight:700; padding:3px 9px; border-radius:6px;}
 
 /* Hora Extra donut / stacked específicos */
 .donut-center-label{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none;}
@@ -2619,15 +2616,15 @@ function renderMovimentacoes(){
     return `<tr>
       <td>${esc(p.unidade)}</td>
       <td>${esc(mes)}</td>
-      <td class="dim-adm">${isAdm? esc(p.colaborador) : '—'}</td>
+      <td>${isAdm? `<span class="dim-adm">${esc(p.colaborador)}</span>` : '—'}</td>
       <td>${isAdm? fmtDateShort(p.data) : '—'}</td>
-      <td class="dim-des">${!isAdm? esc(p.colaborador) : '—'}</td>
+      <td>${!isAdm? `<span class="dim-des">${esc(p.colaborador)}</span>` : '—'}</td>
       <td>${!isAdm? fmtDateShort(p.data) : '—'}</td>
     </tr>`;
   }).join('');
   el.innerHTML = `
     <div class="table-wrap"><div class="table-scroll">
-    <table class="std-table movim-table">
+    <table class="std-table">
       <thead><tr><th>Unidade Operacional</th><th>Mês</th><th>Colaborador Admitido</th><th>Data de Admissão</th><th>Colaborador Demitido</th><th>Data de Demissão</th></tr></thead>
       <tbody>${trs || '<tr><td colspan="6" style="text-align:center;color:var(--tx-secondary)">Nenhum evento no período filtrado.</td></tr>'}</tbody>
     </table></div></div>`;
