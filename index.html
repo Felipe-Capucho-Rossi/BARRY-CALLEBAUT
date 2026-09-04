@@ -58,7 +58,12 @@ button{font-family:var(--font); cursor:pointer;}
 /* ============================================================
    LAYOUT GERAL
    ============================================================ */
-.app{display:flex; min-height:100vh;}
+.app{display:flex; min-height:100vh; min-width:0;}
+/* min-width:0 acima corrige um bug de overflow horizontal: sem isso, o item flex
+   .app nao encolhia para caber na tela quando a Grade Diaria (tabela larga) estava
+   dentro dele, entao a PAGINA INTEIRA (filtros, cabecalho, sidebar) ficava mais
+   larga que a tela em vez de so a tabela rolar internamente — e por isso as
+   colunas de total sticky nunca apareciam de fato na tela do usuario. */
 
 /* ---------- SIDEBAR ---------- */
 .sidebar{
